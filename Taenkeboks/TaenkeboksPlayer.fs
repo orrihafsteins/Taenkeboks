@@ -15,6 +15,7 @@ module TaenkeboksPlayer =
                 let minPlausibleBet = 0.5 
                 let bluff = 0.3 
                 AI.aggressiveStrategy spec 100 100 maxOutragiousBet minGoodBet minPlausibleBet bluff
+            | _ -> failwith "death"
         {
             playerName = name
             policy = policy

@@ -51,7 +51,7 @@ module Simulator =
 module AI = 
     
     // if prob < 1 / players then call else minimum raise
-    let minIncrementStrategy spec simLast :Policy<PublicInformation,TaenkeboksAction> = 
+    let minIncrementStrategy spec simLast :(PublicInformation->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
@@ -62,11 +62,11 @@ module AI =
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 TaenkeboksAction.raise bets.[bi + 1]
         )
-    let panicStrategy:Policy<PublicInformation,TaenkeboksAction> = 
+    let panicStrategy:(PublicInformation->TaenkeboksAction) = 
         (fun info -> 
             failwith "panic!"
         )
-    let minIncrementStrategy2 spec simLast :Policy<PublicInformation,TaenkeboksAction> = 
+    let minIncrementStrategy2 spec simLast :(PublicInformation->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
@@ -77,7 +77,7 @@ module AI =
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 TaenkeboksAction.raise bets.[bi + 1]
         )
-    let bestLocalIncrementStrategy spec simLast simNext:Policy<PublicInformation,TaenkeboksAction> = 
+    let bestLocalIncrementStrategy spec simLast simNext:(PublicInformation->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
@@ -92,7 +92,7 @@ module AI =
                 let bestI = probs |> Array.firstArgMax
                 TaenkeboksAction.raise possible.[bestI]
         )
-    let bestLocalWithPrior spec simLast simNext:Policy<PublicInformation,TaenkeboksAction> = 
+    let bestLocalWithPrior spec simLast simNext:(PublicInformation->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let predictedHands = Array.zeroCreate info.playerCount 
@@ -120,7 +120,7 @@ module AI =
                 TaenkeboksAction.raise possible.[bestI]
         )
 
-    let aggressiveStrategy spec simLast simNext maxOutragiousBetProb minSafeBetProb minPlausibleBetProb bluffProb:Policy<PublicInformation,TaenkeboksAction> = 
+    let aggressiveStrategy spec simLast simNext maxOutragiousBetProb minSafeBetProb minPlausibleBetProb bluffProb:(PublicInformation->TaenkeboksAction) = 
         let bets = Bet.all spec
         let r = new System.Random();
         (fun info -> 

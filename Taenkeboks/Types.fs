@@ -295,9 +295,6 @@ module PlayerState =
     let loseRound playerState:PlayerState = {playerState with livesLeft = playerState.livesLeft - 1}
 
 module TaenkeboksAction =
-    let print (a:TaenkeboksAction) = 
-        if a.call then "Call"
-        else Bet.print a.bet
     let call bet=
         {
             call=true
@@ -308,7 +305,10 @@ module TaenkeboksAction =
             call=false
             bet=bet
         }
-
+    let print (a:TaenkeboksAction) = 
+        if a.call then "Call"
+        else Bet.print a.bet
+    
 module TaenkeboksState =
     let r = new System.Random()
     let init(spec:TaenkeboksGameSpec) = 

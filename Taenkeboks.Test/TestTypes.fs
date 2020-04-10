@@ -24,11 +24,5 @@ let Bet_Comparison_LeftSmaller (smaller:Bet) (larger:Bet) =
     
 
 
-[<Test>]
-let TaenkeboksGame () =
-    let spec = TaenkeboksGameSpec.initClassicRules(2)
-    let game = TaenkeboksGame.create(spec)
-    printfn "%A" game.LegalActions
-    Assert.Fail(sprintf "%A" (game.Visible Side.X))
     
     

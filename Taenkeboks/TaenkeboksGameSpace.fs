@@ -196,5 +196,6 @@ module TaenkeboksGameSpace =
                         actions
                 )
             checkTime = (fun g -> g,false)
+            nextPlayer = (fun g-> g.currentPlayer)
         }
 

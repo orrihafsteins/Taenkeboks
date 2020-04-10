@@ -2,6 +2,21 @@
 open PIM
 open System
 
+module Json =
+
+  open Newtonsoft.Json
+    
+  let serialize obj =
+    JsonConvert.SerializeObject obj
+
+  let deserialize<'a> str =
+    try
+      JsonConvert.DeserializeObject<'a> str
+      |> Result.Ok
+    with
+      // catch all exceptions and convert to Result
+      | ex -> Result.Error ex  
+
 module Seq =
     let all f s = s |> Seq.exists (f>>not) |> not
     let takeMaybe n s = s |> Seq.mapi (fun i v -> (i,v)) |> Seq.takeWhile (fun (i,v) -> i<n) |> Seq.map snd            
