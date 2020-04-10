@@ -2,19 +2,12 @@
 open PIM
 open System
 
-type TaenkeboksGameSpace = GameSpace<TaenkeboksState, TaenkeboksAction, PublicInformation>
-type TaenkeboksPlayer = Player<PublicInformation, TaenkeboksAction>
-type TaenkeboksGame = Game<TaenkeboksState, TaenkeboksAction, PublicInformation>
-module Taenkeboks =
+type TaenkeboksGameSpace = GameSpace<TaenkeboksState,TaenkeboksAction,PublicInformation>
+module TaenkeboksGameSpace =
     let r = new System.Random()
-    let init (spec:TaenkeboksGameSpec) : TaenkeboksState = 
-        if spec.playerCount < 2 then failwith "Player count < 2"
-        let startingPlayer = r.Next() % spec.playerCount
-        TaenkeboksState.init spec spec.playerCount startingPlayer
     let initPlayerStates (spec:TaenkeboksGameSpec) livesLeft= 
         livesLeft
         |> Array.mapi(fun i l-> PlayerState.initRound spec l)
-    
     let countValues spec value (hand:Hand)  =
         if TaenkeboksGameSpec.isSeries spec hand then hand.Length + 1
         else
@@ -50,7 +43,7 @@ module Taenkeboks =
             count=totalCount
             value=value
         },contributions
-    let advanceBet(b:Bet) (state:TaenkeboksState) = 
+    let advanceBet(b:Bet) (state:TaenkeboksState): TaenkeboksState = 
         let dtMove = DateTime.Now;
         let currPlayer = state.playerStates.[state.currentPlayer]
         let nextPlayer =
@@ -71,7 +64,6 @@ module Taenkeboks =
                         }
                 }::state.actionHistory
         }
-        
     let advanceRound (state:TaenkeboksState) (loser:int) (highestStanding:Bet) (contributions:int[]) : TaenkeboksState = 
         let spec = state.spec
         let mutable totalDiceLeft = state.totalDiceLeft
@@ -148,6 +140,61 @@ module Taenkeboks =
                     }
                 else 
                     failwith "death"
-        newState        
-    let surrender (g:TaenkeboksGame) = 
-        failwith "not implemented"
+        newState
+    let advance (state:TaenkeboksState) (side:Side) (action:TaenkeboksAction):TaenkeboksState= 
+        if state.currentPlayer <> side then failwith "death"
+        if action.call then
+            let currentBet = state.currentBet
+            let hStanding,contributions = highestStanding state currentBet
+            let loser =
+                if hStanding >= currentBet then //bet stands, current player loses
+                    state.currentPlayer
+                else //betFails, choppingBlock loses
+                    state.choppingBlock
+            advanceRound state loser hStanding contributions
+        else    
+            if action.bet <= state.currentBet then failwith "bet must be larger"   
+            advanceBet action.bet state
+    let create (spec:TaenkeboksGameSpec):TaenkeboksGameSpace= 
+        {
+            init = (fun () -> TaenkeboksState.init spec)   //(fun ps -> TaenkeboksState.init spec ps.Length)
+            advance = advance
+            validateAction = (fun (g:TaenkeboksState) s b -> 
+                if not g.status.inPlay then
+                    InvalidAction("Game over")
+                elif b.call && g.currentBet = Bet.startingBet then
+                    InvalidAction("Can't call initial bet")
+                elif g.currentPlayer <> s then
+                    InvalidAction("Not players turn")
+                elif (not b.call) && (b.bet<=g.currentBet) then
+                    InvalidAction("Raise must be larger")
+                else 
+                    OK
+            )//Game -> 'A -> bool
+            visible = PublicInformation.create
+            gameOver= (fun state -> not state.status.inPlay)
+            legalActions = 
+                (fun g s ->
+                    if g.currentPlayer <> s then
+                          Array.empty
+                    else
+                        let currentDice = g.playerStates |> Seq.map(fun p -> p.diceLeft) |> Seq.sum
+                        let higherBets =
+                            Bet.allLarger spec g.currentBet currentDice
+                        let actions =
+                            if g.currentBet = Bet.startingBet then
+                                Array.init(higherBets.Length)(fun i->
+                                    TaenkeboksAction.raise (Bet.create higherBets.[i])
+                                )
+                            else
+                                Array.init(higherBets.Length + 1)(fun i->
+                                    if i = 0 then
+                                        TaenkeboksAction.call g.currentBet
+                                    else
+                                        TaenkeboksAction.raise (Bet.create higherBets.[i - 1])
+                                )
+                        actions
+                )
+            checkTime = (fun g -> g,false)
+        }
+

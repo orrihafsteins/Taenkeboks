@@ -5,8 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Util.fs" />
     <Compile Include="Types.fs" />
-    <Compile Include="Game.fs" />
+    <Compile Include="TaenkeboksGameSpace.fs" />
+    <Compile Include="TaenkeboksPlayer.fs" />
+    <Compile Include="TaenkeboksGame.fs" />
   </ItemGroup>
 
   <ItemGroup>

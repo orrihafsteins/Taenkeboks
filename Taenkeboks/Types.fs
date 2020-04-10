@@ -144,7 +144,7 @@ module TaenkeboksGameSpec =
 module Bet =
     let startingBet = {
         count=0
-        value=6//must update count
+        value=6//force update count
     }
     let all spec = 
         let diceCount = spec.diceCount
@@ -310,16 +310,19 @@ module TaenkeboksAction =
         }
 
 module TaenkeboksState =
-    let init(spec:TaenkeboksGameSpec) playerCount currentPlayer:TaenkeboksState = 
+    let r = new System.Random()
+    let init(spec:TaenkeboksGameSpec) = 
+        if spec.playerCount < 2 then failwith "Player count < 2"
+        let startingPlayer = r.Next() % spec.playerCount
         {
             spec=spec
-            totalDiceLeft = playerCount * spec.diceCount
+            totalDiceLeft = spec.playerCount * spec.diceCount
             currentBet = Bet.startingBet
             choppingBlock = -1
-            playersLeft = playerCount
+            playersLeft = spec.playerCount
             message = ""
-            currentPlayer = currentPlayer
-            playerStates = Array.init playerCount (fun i -> PlayerState.init spec)
+            currentPlayer = startingPlayer
+            playerStates = Array.init spec.playerCount (fun i -> PlayerState.init spec)
             status = TaenkeboksStatus.initialStatus
             actionHistory = []
         }
