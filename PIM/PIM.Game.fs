@@ -34,7 +34,7 @@ type Player<'V,'A> =
         playerName:String
         policy:Policy<'V,'A>
         updatePlayer: 'V -> unit
-        think:Player<'V,'A> -> 'V -> CancellationToken-> unit
+        think:'V -> CancellationToken-> unit
     }
 type GameSpace<'S,'A,'V> = 
     {
@@ -74,4 +74,5 @@ type Game<'S,'A,'V>(space:GameSpace<'S,'A,'V>,players:Player<'V,'A>[]) =
             this.UpdatePlayers()
         doUpdate
     member this.PlayerNames = players |> Array.map (fun ps-> ps.playerName)
+    member this.State = gameState
     

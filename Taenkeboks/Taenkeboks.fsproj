@@ -8,6 +8,7 @@
     <Compile Include="Util.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="TaenkeboksGameSpace.fs" />
+    <Compile Include="TaenkeboksAI.fs" />
     <Compile Include="TaenkeboksPlayer.fs" />
     <Compile Include="TaenkeboksGame.fs" />
   </ItemGroup>

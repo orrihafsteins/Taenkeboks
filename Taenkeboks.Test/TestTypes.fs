@@ -1,6 +1,7 @@
 module Taenkeboks.TestTypes
 
 open NUnit.Framework
+open PIM
 
 [<SetUp>]
 let Setup () =
@@ -20,4 +21,14 @@ let Bet_Comparison_LeftSmaller_Cases =
 [<TestCaseSource("Bet_Comparison_LeftSmaller_Cases")>]
 let Bet_Comparison_LeftSmaller (smaller:Bet) (larger:Bet) =
     Assert.IsTrue(smaller<larger)
+    
+
+
+[<Test>]
+let TaenkeboksGame () =
+    let spec = TaenkeboksGameSpec.initClassicRules(2)
+    let game = TaenkeboksGame.create(spec)
+    printfn "%A" game.LegalActions
+    Assert.Fail(sprintf "%A" (game.Visible Side.X))
+    
     
