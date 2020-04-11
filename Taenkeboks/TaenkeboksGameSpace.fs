@@ -7,13 +7,13 @@ module TaenkeboksGameSpace =
     let r = System.Random()
     let initPlayerStates (spec:TaenkeboksGameSpec) livesLeft= 
         livesLeft
-        |> Array.mapi(fun i l-> PlayerState.initRound spec l)
+        |> Array.mapi(fun i l-> PlayerState.initGame spec l)
     let countValues spec value (hand:Hand)  =
         if TaenkeboksGameSpec.isSeries spec hand then hand.Length + 1
         else
             hand |> Seq.filter(fun v -> v=value || v=1) |> Seq.length
     let countAnything spec (hands:Hand[]) = 
-        let i, c = seq{2..6} |> Seq.mapi(fun i v -> i,(hands |> Seq.map(countValues spec v) |> Seq.sum)) |> Seq.maxBy snd
+        let i, c = seq{2..6} |> Seq.mapi(fun i v -> i,(hands |> Seq.sumBy (countValues spec v))) |> Seq.maxBy snd
         c,i+2
     let countTotalValuesContributions spec value (hands:Hand[])  =
         if value = 0 then 
@@ -31,7 +31,7 @@ module TaenkeboksGameSpace =
             let c, v = countAnything spec hands
             c
         else
-            hands |>  Seq.map(countValues spec value) |> Seq.sum
+            hands |>  Seq.sumBy (countValues spec value)
     let evaluateBet (state:TaenkeboksState) (bet:Bet)=
         let count, value = bet.count,bet.value
         let totalCount = countTotalValues state.spec value (state.playerStates |> Array.map (fun p -> p.hand))
@@ -49,7 +49,7 @@ module TaenkeboksGameSpace =
             seq{1..state.spec.playerCount-1} 
             |> Seq.map(fun i -> (state.currentPlayer + i)%state.spec.playerCount)
             |> Seq.find(fun i -> state.playerStates.[i].diceLeft > 0)
-        let playerStates = state.playerStates |> Array.map (fun ps -> ps |> PlayerState.setMessage (sprintf "%s raised %A" (state.playerNames.[state.currentPlayer]) b))
+        let playerStates = state.playerStates |> Array.map (fun ps -> ps |> PlayerState.setMessage (sprintf "%s raised %s" (state.playerNames.[state.currentPlayer]) (b|>Bet.print)))
         {state with
             choppingBlock = state.currentPlayer
             currentBet = b
@@ -63,6 +63,9 @@ module TaenkeboksGameSpace =
                         }
                 }::state.actionHistory
             playerStates= playerStates
+            status = TaenkeboksStatus.defaultStatus
+            roundReport = RoundReport.empty
+            gameReport = GameReport.empty
         }
     let resolveBet (state:TaenkeboksState)  : TaenkeboksState = 
         let currentBet = state.currentBet
@@ -73,8 +76,11 @@ module TaenkeboksGameSpace =
             else //betFails, choppingBlock loses
                 state.choppingBlock
         let spec = state.spec
-        let mutable totalDiceLeft = state.totalDiceLeft
-        let mutable playersLeft = state.playersLeft
+        let diceRemoved = state.playerStates |> Seq.mapi (fun i ps -> if i <> loser && ps.diceLeft > 0 then 1 else 0) |> Seq.sum
+        let totalDiceLeft = state.totalDiceLeft - diceRemoved
+        let playersRemoved  = state.playerStates |> Seq.mapi (fun i ps -> if i <> loser && ps.diceLeft = 1 then 1 else 0) |> Seq.sum
+        let playersLeft = state.playersLeft - playersRemoved
+        let roundReport = RoundReport.lostRound state state.playerStates hStanding loser playersLeft contributions
         let playerStates =
             state.playerStates
             |> Array.mapi(fun index p->
@@ -83,19 +89,17 @@ module TaenkeboksGameSpace =
                         if p.diceLeft = 0 then
                             p
                         elif p.diceLeft = 1 then
-                            totalDiceLeft <- totalDiceLeft - 1
-                            playersLeft <- playersLeft - 1
-                            (p |> PlayerState.win |> PlayerState.clear)
+                            p |> PlayerState.surviveGame
                         else
-                            totalDiceLeft <- totalDiceLeft - 1
-                            (p |> PlayerState.win |> PlayerState.throw)
+                            p |> PlayerState.surviveRound |> PlayerState.throw
                     else
-                        (p |> PlayerState.throw)
+                        p |> PlayerState.loseRound |> PlayerState.throw
                 r
             )
         if playerStates |> Seq.sumBy(fun p -> p.diceLeft) <> totalDiceLeft then
             failwith "death"
-        let roundReport = RoundReport.lostRound state state.playerStates hStanding loser playersLeft contributions
+        
+        
         
         let newState =
             if playersLeft > 1 then
@@ -106,7 +110,9 @@ module TaenkeboksGameSpace =
                         playersLeft = playersLeft
                         currentPlayer = loser
                         playerStates = playerStates
-                        status = TaenkeboksStatus.nextRound roundReport
+                        status = TaenkeboksStatus.nextRound
+                        roundReport = roundReport
+                        gameReport = GameReport.empty
                 }
             else
                 let playerLives = playerStates |> Array.map (fun p -> p.livesLeft)
@@ -121,7 +127,9 @@ module TaenkeboksGameSpace =
                             playersLeft = livingPlayers.Length
                             currentPlayer = if playerLives.[loser] > 0 then loser else livingPlayers.[r.Next() % livingPlayers.Length]
                             playerStates = initPlayerStates spec playerLives
-                            status = TaenkeboksStatus.lostLifeStatus roundReport loser
+                            status = TaenkeboksStatus.gameLost loser
+                            roundReport = roundReport
+                            gameReport = GameReport.empty
                     }
                 elif (spec.lastStanding && livingPlayers.Length = 1) then
                     //playing for a winner and one player left
@@ -132,7 +140,9 @@ module TaenkeboksGameSpace =
                         playersLeft = livingPlayers.Length
                         currentPlayer = Side.None
                         playerStates = initPlayerStates spec playerLives
-                        status = TaenkeboksStatus.wonGameStatus roundReport livingPlayers.[0]
+                        status = TaenkeboksStatus.tournamentWon livingPlayers.[0]
+                        roundReport = roundReport
+                        gameReport = GameReport.tournamentWon livingPlayers.[0]
                     }
                 elif (not spec.lastStanding && livingPlayers.Length < spec.playerCount) then
                     //playing for a loser and a player has lost all lives
@@ -143,7 +153,9 @@ module TaenkeboksGameSpace =
                         playersLeft = livingPlayers.Length
                         currentPlayer = Side.None
                         playerStates = initPlayerStates spec playerLives    
-                        status = TaenkeboksStatus.lostGameStatus roundReport loser
+                        status = TaenkeboksStatus.tournamentLost loser
+                        roundReport = roundReport
+                        gameReport = GameReport.tournamentLost loser
                     }
                 else 
                     failwith "death"
@@ -152,7 +164,7 @@ module TaenkeboksGameSpace =
         if g.currentPlayer <> s then
               Array.empty
         else
-            let currentDice = g.playerStates |> Seq.map(fun p -> p.diceLeft) |> Seq.sum
+            let currentDice = g.playerStates |> Seq.sumBy(fun p -> p.diceLeft)
             let higherBets =
                 Bet.allLarger g.spec g.currentBet currentDice
             let actions =
@@ -163,21 +175,21 @@ module TaenkeboksGameSpace =
                 else
                     Array.init(higherBets.Length + 1)(fun i->
                         if i = 0 then
-                            TaenkeboksAction.call g.currentBet
+                            TaenkeboksAction.call
                         else
                             TaenkeboksAction.raise (Bet.create higherBets.[i - 1])
                     )
             actions    
     let advance (state:TaenkeboksState) (side:Side) (action:TaenkeboksAction):TaenkeboksState= 
-        let addMessage msg = TaenkeboksState.message msg side    
+        let setPlayerMessage msg = TaenkeboksState.message msg side    
         if not state.status.inPlay then
-            state |> addMessage "GameOver"
+            state |> setPlayerMessage "GameOver"
         elif action.call && state.currentBet = Bet.startingBet then
-            state |> addMessage "Can't call initial bet"
+            state |> setPlayerMessage "Can't call initial bet"
         elif state.currentPlayer <> side then
-            state |> addMessage "Not players turn"
+            state |> setPlayerMessage "Not players turn"
         elif (not action.call) && (action.bet<=state.currentBet) then
-            state |> addMessage "Raise must be larger"
+            state |> setPlayerMessage "Raise must be larger"
         else      
             if action.call then 
                 resolveBet state

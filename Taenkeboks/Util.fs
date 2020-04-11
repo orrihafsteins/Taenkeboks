@@ -6,6 +6,8 @@ module Json =
   open Newtonsoft.Json
   let serialize obj =
     JsonConvert.SerializeObject obj
+  let serializeIndented obj =
+    JsonConvert.SerializeObject(obj,Formatting.Indented)
   let deserialize<'a> str =
     try
       JsonConvert.DeserializeObject<'a> str

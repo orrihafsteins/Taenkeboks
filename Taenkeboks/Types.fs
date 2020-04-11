@@ -38,9 +38,9 @@ type TaenkeboksAction = {
     
 type RoundReport =
     {
-        playerMadeBet:int
-        playerCalledBet:int
-        playerLost:int
+        playerMadeBet:Side
+        playerCalledBet:Side
+        playerLost:Side
         playerDice:int[][]
         playerContribution:int[]
         betCalled:Bet
@@ -49,18 +49,17 @@ type RoundReport =
 
 type GameReport =
     {
-        playerWinner:int
-        playerLostLife:int
+        playerWon:Side
+        playerLost:Side
         gameComplete:bool
     }
+
 
 type TaenkeboksStatus =
     {
         inPlay:bool
         loser:Side
         winner:Side
-        roundReport:RoundReport
-        gameReport:GameReport
    }
 
 type TaenkeboksActionInstance = {
@@ -81,6 +80,8 @@ type TaenkeboksState =
         playerStates:PlayerState[]
         status:TaenkeboksStatus
         actionHistory: TaenkeboksActionInstance List
+        roundReport:RoundReport
+        gameReport:GameReport
     }
 
 type PublicInformation =
@@ -99,6 +100,9 @@ type PublicInformation =
         actionHistory: TaenkeboksActionInstance List
         status:TaenkeboksStatus
         playerHand:Hand
+        playerMessage:string
+        roundReport:RoundReport
+        gameReport:GameReport
     }
 
 module TaenkeboksGameSpec =
@@ -110,7 +114,7 @@ module TaenkeboksGameSpec =
             multiSeries=false
             oneIsSeries=true
             extraLives = 1
-            lastStanding = false
+            lastStanding = true
         }
     let initTestRules playerCount= 
         {
@@ -145,6 +149,10 @@ module Bet =
         count=0
         value=6//force update count
     }
+    let call = {
+        count = -1
+        value = -1
+    }    
     let all spec = 
         let diceCount = spec.diceCount
         let playerCount = spec.playerCount
@@ -164,8 +172,8 @@ module Bet =
                 for value in 2..6 do yield count, value
         |]
     let print (bet:Bet) = 
-        let v = if bet.value = 0 then "anything" else (sprintf "%ds" bet.value)
-        sprintf "%d of %s" bet.count v
+        
+        sprintf "%dd%d" bet.count bet.value
     let create (count,value) =
         {count=count;value=value}
 
@@ -198,73 +206,63 @@ module RoundReport =
 module GameReport = 
     let empty:GameReport= 
         {
-            playerWinner=Side.None
-            playerLostLife=Side.None
+            playerWon=Side.None
+            playerLost=Side.None
             gameComplete= false
-        }
-    let playerLostLife loser = 
-        {
-            playerWinner=Side.None
-            playerLostLife=loser
-            gameComplete= false
-        }
-    let gameWon winner = 
-        {
-            playerWinner=winner
-            playerLostLife=Side.None
-            gameComplete= true
         }
     let gameLost loser = 
         {
-            playerWinner=Side.None
-            playerLostLife= loser
+            playerWon=Side.None
+            playerLost=loser
+            gameComplete= false
+        }
+    let tournamentWon winner = 
+        {
+            playerWon=winner
+            playerLost=Side.None
+            gameComplete= true
+        }
+    let tournamentLost loser = 
+        {
+            playerWon=Side.None
+            playerLost= loser
             gameComplete= true
         }
 
 module TaenkeboksStatus =
-    let initialStatus: TaenkeboksStatus =
+    let defaultStatus: TaenkeboksStatus =
         {
             inPlay=true
             loser=Side.None
             winner=Side.None
-            roundReport = RoundReport.empty
-            gameReport = GameReport.empty
         }
-    let nextRound roundReport: TaenkeboksStatus =
+    let nextRound: TaenkeboksStatus =
         {
             inPlay=true
             loser=Side.None
             winner=Side.None
-            roundReport = roundReport
-            gameReport = GameReport.empty
         }       
-    let lostLifeStatus roundReport loser= 
+    let gameLost loser= 
         {
             inPlay=true
             loser=Side.None
             winner=Side.None
-            roundReport = roundReport
-            gameReport = GameReport.playerLostLife loser
         }
-    let lostGameStatus roundReport loser = 
+    let tournamentLost loser = 
         {
             inPlay=false
             loser=loser
             winner=Side.None
-            roundReport=roundReport
-            gameReport = GameReport.gameLost loser
         }
-    let wonGameStatus roundReport winner = 
+    let tournamentWon winner = 
         {
             inPlay=false
             loser=Side.None
             winner = winner
-            roundReport=roundReport
-            gameReport = GameReport.gameWon winner
         }
 
 module Hand =
-    let r = new System.Random()
+    let r = System.Random()
     let throw() = r.Next()%6 + 1
     let throwN n = Array.init n (fun i-> throw()) |> Array.sort
     let print(h:Hand) = h |> Seq.map(fun i -> string i) |> String.concat ","
@@ -277,31 +275,32 @@ module PlayerState =
             livesLeft = 0
             message = ""
         }
-    let init spec =
+    let initTournament spec =
+        let livesLeft = spec.extraLives + 1
         {
             diceLeft = spec.diceCount
             hand = Hand.throwN spec.diceCount
-            livesLeft = spec.extraLives + 1
-            message = "Game start"
+            livesLeft = livesLeft
+            message = sprintf "Game start %d lives left" livesLeft
         }
-    let initRound spec lives=
+    let initGame spec lives=
         {
             diceLeft = if lives > 0 then spec.diceCount else 0
             hand = if lives > 0 then Hand.throwN spec.diceCount else [||]
             livesLeft = lives
-            message = "Round start"
+            message = sprintf "Game start %d lives left" lives
         }
     let throw playerState:PlayerState = {playerState with hand = Hand.throwN playerState.diceLeft}
-    let clear playerState:PlayerState = {playerState with hand = Array.empty}
-    let win playerState:PlayerState = {playerState with hand = Array.empty; diceLeft = playerState.diceLeft - 1}
-    let loseRound playerState:PlayerState = {playerState with livesLeft = playerState.livesLeft - 1}
+    let surviveGame playerState:PlayerState = {playerState with hand = Array.empty; diceLeft = 0; message = "Survived game"}
+    let surviveRound playerState:PlayerState = {playerState with hand = Array.empty; diceLeft = playerState.diceLeft - 1;message = "Survived round"}
+    let loseRound playerState:PlayerState = {playerState with message = "Lost round"}
     let setMessage message playerState:PlayerState = {playerState with message = message}
 
 module TaenkeboksAction =
-    let call bet=
+    let call=
         {
             call=true
-            bet=bet
+            bet=Bet.startingBet
         }
     let raise bet=
         {
@@ -312,7 +311,7 @@ module TaenkeboksAction =
         if a.call then "Call"
         else Bet.print a.bet
 module TaenkeboksState =
-    let r = new System.Random()
+    let r = System.Random()
     let init(spec:TaenkeboksGameSpec) (playerNames:string[])= 
         if spec.playerCount < 2 then failwith "Player count < 2"
         let startingPlayer = r.Next() % spec.playerCount
@@ -324,9 +323,11 @@ module TaenkeboksState =
             choppingBlock = -1
             playersLeft = spec.playerCount
             currentPlayer = startingPlayer
-            playerStates = Array.init spec.playerCount (fun i -> PlayerState.init spec)
-            status = TaenkeboksStatus.initialStatus
+            playerStates = Array.init spec.playerCount (fun i -> PlayerState.initTournament spec)
+            status = TaenkeboksStatus.defaultStatus
             actionHistory = []
+            roundReport = RoundReport.empty
+            gameReport = GameReport.empty
         }
     let message msg side state =
         // Add a message to a particular player
@@ -353,7 +354,10 @@ module PublicInformation =
             livesLeft = s.playerStates |> Array.map(fun p-> p.livesLeft)
             viewingPlayer = player
             status = s.status
+            playerMessage = s.playerStates.[player].message
             playerHand = s.playerStates.[player].hand
+            roundReport = s.roundReport
+            gameReport = s.gameReport
         }
     let othersDice(v:PublicInformation) = 
         v.diceLeft |> Array.mapi(fun i x -> (i<> v.viewingPlayer,x)) |> Array.filter fst |> Array.map snd

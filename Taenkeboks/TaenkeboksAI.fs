@@ -57,7 +57,7 @@ module AI =
             let p = Simulator.sampleCurrentBet info simLast
             let target = 1.0 / (float info.playersLeft)
             if p < target then
-                TaenkeboksAction.call info.currentBet
+                TaenkeboksAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 TaenkeboksAction.raise bets.[bi + 1]
@@ -72,7 +72,7 @@ module AI =
             let p = Simulator.sampleCurrentBet info simLast
             let target = 0.25
             if p < target then
-                TaenkeboksAction.call info.currentBet
+                TaenkeboksAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 TaenkeboksAction.raise bets.[bi + 1]
@@ -83,7 +83,7 @@ module AI =
             let p = Simulator.sampleCurrentBet info simLast
             let target = 1.0 / (float info.playersLeft)
             if p < target then
-                TaenkeboksAction.call info.currentBet
+                TaenkeboksAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 let possible = bets.[bi+1..bi+1+6]
@@ -109,7 +109,7 @@ module AI =
             let p = Simulator.sampleCurrentBet info simLast
             let target = 1.0 / (float info.playersLeft)
             if p < target then
-                TaenkeboksAction.call info.currentBet
+                TaenkeboksAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 let possible = bets.[bi+1..bi+1+6]
@@ -127,7 +127,7 @@ module AI =
             let p = Simulator.sampleCurrentBet info simLast
 //            let maxOutragiousBet = 0.1
             if p < maxOutragiousBetProb then
-                TaenkeboksAction.call info.currentBet
+                TaenkeboksAction.call
             else
                 //let raiseTarget = 1.5 / (float info.playersLeft)
 //                let minGoodBet = 0.8
@@ -200,7 +200,7 @@ module AI =
                 if bestI >= 0 then
                     TaenkeboksAction.raise possible.[bestI]
                 else
-                    TaenkeboksAction.call info.currentBet
+                    TaenkeboksAction.call
         )
 
     let createAggressivePlayer spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff name:Player<PublicInformation,TaenkeboksAction> =
@@ -275,7 +275,7 @@ module AI =
                 //let p = Simulator.sampleCurrentBet info simLast
                 let target = 1.0 / (float info.playersLeft)
                 if bi > 0 && p < target then
-                    TaenkeboksAction.call info.currentBet
+                    TaenkeboksAction.call
                 else
                     //let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                     let posB,posP = t.[bi+1..bi+1+6] |> Array.rev |> Array.unzip

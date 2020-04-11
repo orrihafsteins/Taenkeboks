@@ -1,24 +1,107 @@
 namespace Taenkeboks.Console
 open System
 open Taenkeboks
+type PlayerRoundReportView = {
+    name:string
+    dice:int[]
+    contribution:int
+}
+type RoundReportView = {
+    playerMadeBet:string
+    playerCalledBet:string
+    playerLost:string
+    players:PlayerRoundReportView[]
+    betCalled:string
+    betHighestStanding:string
+}
+
+module RoundReportView = 
+    let create (v:PublicInformation) :RoundReportView =
+        let report = v.roundReport
+        {
+            playerMadeBet=v.playerNames.[report.playerMadeBet]
+            players = Array.init v.playerCount (fun i -> {name=v.playerNames.[i];dice=report.playerDice.[i];contribution=report.playerContribution.[i]})
+            playerCalledBet=v.playerNames.[report.playerCalledBet]
+            playerLost=v.playerNames.[report.playerLost]
+            betCalled=report.betCalled |> Bet.print
+            betHighestStanding= report.betHighestStanding |> Bet.print
+        }
+
+type GameReportView = {
+    playerWinner:string
+    playerLostLife:string
+    gameComplete:bool
+}
+module GameReportView = 
+    let create (v:PublicInformation) =
+        let report = v.gameReport
+        {
+            playerWinner = if report.playerWon >= 0 then v.playerNames.[report.playerWon] else ""
+            playerLostLife = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
+            gameComplete=report.gameComplete
+        }        
+type PlayerStateView ={
+    name:string
+    diceLeft: int
+    livesLeft: int
+}    
+type StateView = {
+        nextPlayer:string
+        players:PlayerStateView[]
+        totalDiceLeft:int
+        choppingBlock:string
+        currentBet:string
+        playerMessage:string
+        playerHand:Hand
+}
+module StateView = 
+    let create (info:PublicInformation) =
+        let choppingBlock = if info.choppingBlock >= 0 then info.playerNames.[info.choppingBlock] else ""
+        {
+            nextPlayer = info.playerNames.[info.nextPlayer]
+            players = Array.init info.playerCount (fun i -> {name=info.playerNames.[i];diceLeft=info.diceLeft.[i];livesLeft=info.livesLeft.[i]})
+            totalDiceLeft = info.totalDiceLeft
+            choppingBlock = choppingBlock
+            currentBet = info.currentBet |> Bet.print
+            playerMessage = info.playerMessage
+            playerHand = info.playerHand
+        }
 
 module ConsolePlayer =
     let create name : TaenkeboksPlayer = 
-        let rec getMove (state:PublicInformation) =
+        let parseMove s:Result<TaenkeboksAction,Exception> =
+            if s = "c" then
+                Ok TaenkeboksAction.call 
+            else 
+                try
+                    let count = Int32.Parse(string s.[0])
+                    let value = Int32.Parse(string s.[2])
+                    Ok (TaenkeboksAction.raise {count = count;value = value})
+                with 
+                | e -> Error e
+
+        let rec getMove () =
             printf "Enter move %s: " name
-            let move = Console.ReadLine();
-            match Json.deserialize<TaenkeboksAction>(move) with
+            let sMove = Console.ReadLine();
+            match parseMove sMove with
             | Error err -> 
                 printfn "Could not parse move: %A" err.Message
-                getMove (state)  
-            |  Ok oMove ->
-                oMove
+                getMove ()  
+            |  Ok move ->
+                move
         {    
             playerName = name
-            policy = (fun state ->
-                getMove state            
+            policy = (fun v ->
+                printfn "----------------------------- POLICY ---------------------------------"
+                v |> StateView.create |> Json.serializeIndented |> printfn "%s" 
+                getMove ()
             )
             updatePlayer = (fun v -> 
-                v |> Json.serialize |> printfn "%s" 
+                printfn "----------------------------- UPDATE ---------------------------------"
+                printfn "%s" v.playerMessage
+                if v.roundReport <> RoundReport.empty then
+                    v |> RoundReportView.create |> Json.serializeIndented |> printfn "%s" 
+                if v.gameReport <> GameReport.empty then
+                    v |> GameReportView.create |> Json.serializeIndented |> printfn "%s"
             )
         } 
