@@ -5,9 +5,6 @@ open System
 type TaenkeboksGameSpace = GameSpace<TaenkeboksState,TaenkeboksAction,TaenkeboksVisible>
 module TaenkeboksGameSpace =
     let r = System.Random()
-    let initPlayerStates (spec:TaenkeboksGameSpec) livesLeft= 
-        livesLeft
-        |> Array.mapi(fun i l-> PlayerState.initGame spec l)
     let countValues spec value (hand:Hand)  =
         if TaenkeboksGameSpec.isSeries spec hand then hand.Length + 1
         else
@@ -63,7 +60,7 @@ module TaenkeboksGameSpace =
                         }
                 }::state.actionHistory
             playerStates= playerStates
-            status = TaenkeboksStatus.defaultStatus
+            status = TaenkeboksStatus.inPlay
             roundReport = RoundReport.empty
             gameReport = GameReport.empty
         }
@@ -110,7 +107,7 @@ module TaenkeboksGameSpace =
                         playersLeft = playersLeft
                         currentPlayer = loser
                         playerStates = playerStates
-                        status = TaenkeboksStatus.nextRound
+                        status = TaenkeboksStatus.inPlay
                         roundReport = roundReport
                         gameReport = GameReport.empty
                 }
@@ -126,8 +123,8 @@ module TaenkeboksGameSpace =
                             choppingBlock = -1
                             playersLeft = livingPlayers.Length
                             currentPlayer = if playerLives.[loser] > 0 then loser else livingPlayers.[r.Next() % livingPlayers.Length]
-                            playerStates = initPlayerStates spec playerLives
-                            status = TaenkeboksStatus.gameLost loser
+                            playerStates = playerStates
+                            status = TaenkeboksStatus.inPlay
                             roundReport = roundReport
                             gameReport = GameReport.empty
                     }
@@ -139,7 +136,7 @@ module TaenkeboksGameSpace =
                         choppingBlock = Side.None
                         playersLeft = livingPlayers.Length
                         currentPlayer = Side.None
-                        playerStates = initPlayerStates spec playerLives
+                        playerStates = playerStates
                         status = TaenkeboksStatus.tournamentWon livingPlayers.[0]
                         roundReport = roundReport
                         gameReport = GameReport.gameLost loser
@@ -153,7 +150,7 @@ module TaenkeboksGameSpace =
                         choppingBlock = Side.None
                         playersLeft = livingPlayers.Length
                         currentPlayer = Side.None
-                        playerStates = initPlayerStates spec playerLives    
+                        playerStates = playerStates
                         status = TaenkeboksStatus.tournamentLost loser
                         roundReport = roundReport
                         gameReport = GameReport.gameLost loser
@@ -183,7 +180,7 @@ module TaenkeboksGameSpace =
                     )
             actions    
     let advance (state:TaenkeboksState) (side:Side) (action:TaenkeboksAction):TaenkeboksState= 
-        let setPlayerMessage msg = TaenkeboksState.message msg side    
+        let setPlayerMessage msg = TaenkeboksState.messagePlayer msg side    
         if not state.status.inPlay then
             state |> setPlayerMessage "GameOver"
         elif action.call && state.currentBet = Bet.startingBet then
@@ -199,7 +196,7 @@ module TaenkeboksGameSpace =
                 advanceBet action.bet state     
     let create (spec:TaenkeboksGameSpec):TaenkeboksGameSpace= 
         {
-            init = (fun playerNames -> TaenkeboksState.init spec playerNames)   //(fun ps -> TaenkeboksState.init spec ps.Length)
+            init = (fun playerNames -> TaenkeboksState.create spec playerNames)   //(fun ps -> TaenkeboksState.init spec ps.Length)
             advance = advance
             visible = PublicInformation.create
             gameOver= (fun state -> not state.status.inPlay)

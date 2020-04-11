@@ -147,7 +147,6 @@ module TaenkeboksGameSpec =
         elif spec.multiSeries && hand.Length > 1 && hand = ([| hand.[0]..(hand.[0] + hand.Length) |]) then
             true
         else (spec.multiSeries |> not) && hand.Length > 1 && hand = ([| 1..hand.Length |])
-            
 
 module Bet =
     let startingBet = {
@@ -234,19 +233,7 @@ module GameReport =
         }
 
 module TaenkeboksStatus =
-    let defaultStatus: TaenkeboksStatus =
-        {
-            inPlay=true
-            loser=Side.None
-            winner=Side.None
-        }
-    let nextRound: TaenkeboksStatus =
-        {
-            inPlay=true
-            loser=Side.None
-            winner=Side.None
-        }       
-    let gameLost loser= 
+    let inPlay: TaenkeboksStatus =
         {
             inPlay=true
             loser=Side.None
@@ -314,9 +301,10 @@ module TaenkeboksAction =
     let print (a:TaenkeboksAction) = 
         if a.call then "Call"
         else Bet.print a.bet
+
 module TaenkeboksState =
     let r = System.Random()
-    let init(spec:TaenkeboksGameSpec) (playerNames:string[])= 
+    let create(spec:TaenkeboksGameSpec) (playerNames:string[])= 
         if spec.playerCount < 2 then failwith "Player count < 2"
         let startingPlayer = r.Next() % spec.playerCount
         {
@@ -328,13 +316,13 @@ module TaenkeboksState =
             playersLeft = spec.playerCount
             currentPlayer = startingPlayer
             playerStates = Array.init spec.playerCount (fun i -> PlayerState.initTournament spec)
-            status = TaenkeboksStatus.defaultStatus
+            status = TaenkeboksStatus.inPlay
             actionHistory = []
             roundReport = RoundReport.empty
             gameReport = GameReport.empty
             tournamentReport = TournamentReport.empty
         }
-    let message msg side state =
+    let messagePlayer msg side state =
         // Add a message to a particular player
         let playerStates = state.playerStates |> Array.mapi (fun i ps->
             if i = side then
