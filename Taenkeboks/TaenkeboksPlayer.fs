@@ -1,6 +1,6 @@
 ﻿namespace Taenkeboks
 open PIM
-type TaenkeboksPlayer = Player<PublicInformation,TaenkeboksAction>
+type TaenkeboksPlayer = Player<TaenkeboksVisible,TaenkeboksAction>
 module TaenkeboksPlayer =
     let createPlayer spec playerType name: TaenkeboksPlayer =
         let policy = 

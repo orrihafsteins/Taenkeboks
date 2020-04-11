@@ -45,13 +45,13 @@ module Simulator =
                 let sampleCount = otherCount + myCount
                 if sampleCount >= count then wins <- wins + 1
         (float wins) / (float n)
-    let sampleCurrentBet (g:PublicInformation) n =     
+    let sampleCurrentBet (g:TaenkeboksVisible) n =     
         let otherDice = g.diceLeft |> Array.mapi (fun i x -> (i<>g.nextPlayer,x)) |> Array.filter fst |> Array.map snd
         sampleBet g.spec g.playerHand otherDice n g.currentBet
 module AI = 
     
     // if prob < 1 / players then call else minimum raise
-    let minIncrementStrategy spec simLast :(PublicInformation->TaenkeboksAction) = 
+    let minIncrementStrategy spec simLast :(TaenkeboksVisible->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
@@ -62,11 +62,11 @@ module AI =
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 TaenkeboksAction.raise bets.[bi + 1]
         )
-    let panicStrategy:(PublicInformation->TaenkeboksAction) = 
+    let panicStrategy:(TaenkeboksVisible->TaenkeboksAction) = 
         (fun info -> 
             failwith "panic!"
         )
-    let minIncrementStrategy2 spec simLast :(PublicInformation->TaenkeboksAction) = 
+    let minIncrementStrategy2 spec simLast :(TaenkeboksVisible->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
@@ -77,7 +77,7 @@ module AI =
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 TaenkeboksAction.raise bets.[bi + 1]
         )
-    let bestLocalIncrementStrategy spec simLast simNext:(PublicInformation->TaenkeboksAction) = 
+    let bestLocalIncrementStrategy spec simLast simNext:(TaenkeboksVisible->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
@@ -92,7 +92,7 @@ module AI =
                 let bestI = probs |> Array.firstArgMax
                 TaenkeboksAction.raise possible.[bestI]
         )
-    let bestLocalWithPrior spec simLast simNext:(PublicInformation->TaenkeboksAction) = 
+    let bestLocalWithPrior spec simLast simNext:(TaenkeboksVisible->TaenkeboksAction) = 
         let bets = Bet.all spec
         (fun info -> 
             let predictedHands = Array.zeroCreate info.playerCount 
@@ -120,7 +120,7 @@ module AI =
                 TaenkeboksAction.raise possible.[bestI]
         )
 
-    let aggressiveStrategy spec simLast simNext maxOutragiousBetProb minSafeBetProb minPlausibleBetProb bluffProb:(PublicInformation->TaenkeboksAction) = 
+    let aggressiveStrategy spec simLast simNext maxOutragiousBetProb minSafeBetProb minPlausibleBetProb bluffProb:(TaenkeboksVisible->TaenkeboksAction) = 
         let bets = Bet.all spec
         let r = new System.Random();
         (fun info -> 
@@ -203,14 +203,14 @@ module AI =
                     TaenkeboksAction.call
         )
 
-    let createAggressivePlayer spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff name:Player<PublicInformation,TaenkeboksAction> =
+    let createAggressivePlayer spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff name:Player<TaenkeboksVisible,TaenkeboksAction> =
         {
             playerName = name
             policy=aggressiveStrategy spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff
             updatePlayer = (fun visible -> ())
         }
     
-    let createMinIncrementPlayer spec simLast name:Player<PublicInformation,TaenkeboksAction> =
+    let createMinIncrementPlayer spec simLast name:Player<TaenkeboksVisible,TaenkeboksAction> =
         {   
             playerName = name
             policy=minIncrementStrategy spec simLast
@@ -218,13 +218,13 @@ module AI =
         }
     
 
-    let createLocIncrPlayer spec simLast simNext name:Player<PublicInformation,TaenkeboksAction> =
+    let createLocIncrPlayer spec simLast simNext name:Player<TaenkeboksVisible,TaenkeboksAction> =
         {
             playerName = name
             policy=bestLocalIncrementStrategy spec simLast simNext
             updatePlayer = (fun visible -> ())
         }
-    let betProbs (visible:PublicInformation) maxCount =
+    let betProbs (visible:TaenkeboksVisible) maxCount =
         let n = 100
         let othersDice = PublicInformation.othersDice visible
         let hand = visible.playerHand
@@ -263,7 +263,7 @@ module AI =
         t
 
         
-    let createCachedPlayer gameSpec name simLast simNext:Player<PublicInformation,TaenkeboksAction> = 
+    let createCachedPlayer gameSpec name simLast simNext:Player<TaenkeboksVisible,TaenkeboksAction> = 
         let mutable t = Array.empty //betProbs (visible:PublicInformation) maxCount          
         
         {

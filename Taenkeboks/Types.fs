@@ -31,11 +31,24 @@ type Bet = {
     value:int
 }
 
+type TaenkeboksStatus =
+    {
+        inPlay:bool
+        loser:Side
+        winner:Side
+   }
+   
 type TaenkeboksAction = {
     call:bool
     bet:Bet
 }
-    
+       
+type TaenkeboksActionInstance = {
+    time:DateTime
+    side:Side
+    action: TaenkeboksAction
+}
+
 type RoundReport =
     {
         playerMadeBet:Side
@@ -58,19 +71,6 @@ type TournamentReport =
         playerLost:Side
     }
 
-type TaenkeboksStatus =
-    {
-        inPlay:bool
-        loser:Side
-        winner:Side
-   }
-
-type TaenkeboksActionInstance = {
-    time:DateTime
-    side:Side
-    action: TaenkeboksAction
-}
-
 type TaenkeboksState =
     {
         playerNames:String[]
@@ -88,7 +88,7 @@ type TaenkeboksState =
         tournamentReport:TournamentReport
     }
 
-type PublicInformation =
+type TaenkeboksVisible =
     {
         playerNames:string[]
         spec:TaenkeboksGameSpec
@@ -177,7 +177,6 @@ module Bet =
                 for value in 2..6 do yield count, value
         |]
     let print (bet:Bet) = 
-        
         sprintf "%dd%d" bet.count bet.value
     let create (count,value) =
         {count=count;value=value}
@@ -194,7 +193,6 @@ module RoundReport =
             betHighestStanding=Bet.startingBet
         }
     let lostRound (state:TaenkeboksState) (playerStates:PlayerState[]) (highestStanding:Bet) loser playersLeft playerContributions  = 
-        
         let playerDice = playerStates |> Array.map (fun p->p.hand)
         let roundReport = 
              {
@@ -207,6 +205,7 @@ module RoundReport =
                 betHighestStanding=highestStanding
             }
         roundReport
+
 module TournamentReport =
     let empty =
         {
@@ -223,6 +222,7 @@ module TournamentReport =
             playerWon=Side.None
             playerLost= loser
         }
+
 module GameReport = 
     let empty:GameReport= 
         {
@@ -232,8 +232,6 @@ module GameReport =
         {
             playerLost=loser
         }
-    
-    
 
 module TaenkeboksStatus =
     let defaultStatus: TaenkeboksStatus =
@@ -367,6 +365,6 @@ module PublicInformation =
             gameReport = s.gameReport
             tournamentReport = s.tournamentReport
         }
-    let othersDice(v:PublicInformation) = 
+    let othersDice(v:TaenkeboksVisible) = 
         v.diceLeft |> Array.mapi(fun i x -> (i<> v.viewingPlayer,x)) |> Array.filter fst |> Array.map snd
 

@@ -16,7 +16,7 @@ type RoundReportView = {
 }
 
 module RoundReportView = 
-    let create (v:PublicInformation) :RoundReportView =
+    let create (v:TaenkeboksVisible) :RoundReportView =
         let report = v.roundReport
         {
             playerMadeBet=v.playerNames.[report.playerMadeBet]
@@ -31,7 +31,7 @@ type GameReportView = {
     playerLost:string
 }
 module GameReportView = 
-    let create (v:PublicInformation) =
+    let create (v:TaenkeboksVisible) =
         let report = v.gameReport
         {
             playerLost = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
@@ -42,7 +42,7 @@ type TournamentReportView = {
     playerLost:string
 }
 module TournamentReportView = 
-    let create (v:PublicInformation) =
+    let create (v:TaenkeboksVisible) =
         let report = v.tournamentReport
         {
             playerLost = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
@@ -64,13 +64,12 @@ type StateView = {
         playerHand:Hand
 }
 module StateView = 
-    let create (info:PublicInformation) =
-        let choppingBlock = if info.choppingBlock >= 0 then info.playerNames.[info.choppingBlock] else ""
+    let create (info:TaenkeboksVisible) =
         {
             nextPlayer = info.playerNames.[info.nextPlayer]
             players = Array.init info.playerCount (fun i -> {name=info.playerNames.[i];diceLeft=info.diceLeft.[i];livesLeft=info.livesLeft.[i]})
             totalDiceLeft = info.totalDiceLeft
-            choppingBlock = choppingBlock
+            choppingBlock = if info.choppingBlock >= 0 then info.playerNames.[info.choppingBlock] else ""
             currentBet = info.currentBet |> Bet.print
             playerMessage = info.playerMessage
             playerHand = info.playerHand
@@ -101,7 +100,7 @@ module ConsolePlayer =
         {    
             playerName = name
             policy = (fun v ->
-                printfn "----------------------------- POLICY ---------------------------------"
+                printfn "----------------------------- GET MOVE -------------------------------"
                 v |> StateView.create |> Json.serializeIndented |> printfn "%s" 
                 getMove ()
             )

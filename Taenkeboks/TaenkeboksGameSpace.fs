@@ -2,7 +2,7 @@
 open PIM
 open System
 
-type TaenkeboksGameSpace = GameSpace<TaenkeboksState,TaenkeboksAction,PublicInformation>
+type TaenkeboksGameSpace = GameSpace<TaenkeboksState,TaenkeboksAction,TaenkeboksVisible>
 module TaenkeboksGameSpace =
     let r = System.Random()
     let initPlayerStates (spec:TaenkeboksGameSpec) livesLeft= 
