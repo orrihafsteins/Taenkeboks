@@ -49,11 +49,14 @@ type RoundReport =
 
 type GameReport =
     {
-        playerWon:Side
         playerLost:Side
-        gameComplete:bool
     }
 
+type TournamentReport =
+    {
+        playerWon:Side
+        playerLost:Side
+    }
 
 type TaenkeboksStatus =
     {
@@ -82,6 +85,7 @@ type TaenkeboksState =
         actionHistory: TaenkeboksActionInstance List
         roundReport:RoundReport
         gameReport:GameReport
+        tournamentReport:TournamentReport
     }
 
 type PublicInformation =
@@ -103,6 +107,7 @@ type PublicInformation =
         playerMessage:string
         roundReport:RoundReport
         gameReport:GameReport
+        tournamentReport:TournamentReport
     }
 
 module TaenkeboksGameSpec =
@@ -202,32 +207,33 @@ module RoundReport =
                 betHighestStanding=highestStanding
             }
         roundReport
-
-module GameReport = 
-    let empty:GameReport= 
+module TournamentReport =
+    let empty =
         {
             playerWon=Side.None
             playerLost=Side.None
-            gameComplete= false
-        }
-    let gameLost loser = 
-        {
-            playerWon=Side.None
-            playerLost=loser
-            gameComplete= false
         }
     let tournamentWon winner = 
         {
             playerWon=winner
             playerLost=Side.None
-            gameComplete= true
         }
     let tournamentLost loser = 
         {
             playerWon=Side.None
             playerLost= loser
-            gameComplete= true
         }
+module GameReport = 
+    let empty:GameReport= 
+        {
+            playerLost=Side.None
+        }
+    let gameLost loser = 
+        {
+            playerLost=loser
+        }
+    
+    
 
 module TaenkeboksStatus =
     let defaultStatus: TaenkeboksStatus =
@@ -328,6 +334,7 @@ module TaenkeboksState =
             actionHistory = []
             roundReport = RoundReport.empty
             gameReport = GameReport.empty
+            tournamentReport = TournamentReport.empty
         }
     let message msg side state =
         // Add a message to a particular player
@@ -358,6 +365,7 @@ module PublicInformation =
             playerHand = s.playerStates.[player].hand
             roundReport = s.roundReport
             gameReport = s.gameReport
+            tournamentReport = s.tournamentReport
         }
     let othersDice(v:PublicInformation) = 
         v.diceLeft |> Array.mapi(fun i x -> (i<> v.viewingPlayer,x)) |> Array.filter fst |> Array.map snd

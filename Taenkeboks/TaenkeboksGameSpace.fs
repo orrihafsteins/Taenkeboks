@@ -142,7 +142,8 @@ module TaenkeboksGameSpace =
                         playerStates = initPlayerStates spec playerLives
                         status = TaenkeboksStatus.tournamentWon livingPlayers.[0]
                         roundReport = roundReport
-                        gameReport = GameReport.tournamentWon livingPlayers.[0]
+                        gameReport = GameReport.gameLost loser
+                        tournamentReport = TournamentReport.tournamentWon livingPlayers.[0]
                     }
                 elif (not spec.lastStanding && livingPlayers.Length < spec.playerCount) then
                     //playing for a loser and a player has lost all lives
@@ -155,7 +156,8 @@ module TaenkeboksGameSpace =
                         playerStates = initPlayerStates spec playerLives    
                         status = TaenkeboksStatus.tournamentLost loser
                         roundReport = roundReport
-                        gameReport = GameReport.tournamentLost loser
+                        gameReport = GameReport.gameLost loser
+                        tournamentReport = TournamentReport.tournamentLost loser
                     }
                 else 
                     failwith "death"

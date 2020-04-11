@@ -28,18 +28,27 @@ module RoundReportView =
         }
 
 type GameReportView = {
-    playerWinner:string
-    playerLostLife:string
-    gameComplete:bool
+    playerLost:string
 }
 module GameReportView = 
     let create (v:PublicInformation) =
         let report = v.gameReport
         {
-            playerWinner = if report.playerWon >= 0 then v.playerNames.[report.playerWon] else ""
-            playerLostLife = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
-            gameComplete=report.gameComplete
+            playerLost = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
         }        
+
+type TournamentReportView = {
+    playerWon:string
+    playerLost:string
+}
+module TournamentReportView = 
+    let create (v:PublicInformation) =
+        let report = v.tournamentReport
+        {
+            playerLost = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
+            playerWon = if report.playerWon >= 0 then v.playerNames.[report.playerWon] else ""
+        }        
+
 type PlayerStateView ={
     name:string
     diceLeft: int
@@ -98,10 +107,12 @@ module ConsolePlayer =
             )
             updatePlayer = (fun v -> 
                 printfn "----------------------------- UPDATE ---------------------------------"
-                printfn "%s" v.playerMessage
                 if v.roundReport <> RoundReport.empty then
                     v |> RoundReportView.create |> Json.serializeIndented |> printfn "%s" 
                 if v.gameReport <> GameReport.empty then
                     v |> GameReportView.create |> Json.serializeIndented |> printfn "%s"
+                if v.tournamentReport <> TournamentReport.empty then
+                    v |> TournamentReportView.create |> Json.serializeIndented |> printfn "%s"
+                printfn "MESSAGE: %s" v.playerMessage
             )
         } 
