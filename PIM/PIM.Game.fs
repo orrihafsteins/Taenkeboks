@@ -33,11 +33,14 @@ type Player<'V,'A> =
         playerName:String
         policy:'V -> 'A
         updatePlayer: 'V -> unit
+        messagePlayer: string->unit
         think:'V -> CancellationToken-> unit
     }
+
+type PlayerName = string
 type GameSpace<'S,'A,'V> = 
     {
-        init: unit -> 'S
+        init: PlayerName[] -> 'S
         advance:'S-> Side -> 'A -> 'S
         legalActions: 'S -> Side -> 'A[]
         validateAction:'S -> Side -> 'A -> ValidateActionResult
@@ -67,7 +70,7 @@ module Game =
                     failwith "Invalid action" // should be validated and reported at client
                 let nextState =  space.advance state nextSide nextPlayerMove 
                 resolve nextState
-        let initial = space.init()
+        let initial = space.init (players |> Array.map (fun p -> p.playerName))
         resolve initial
         
     

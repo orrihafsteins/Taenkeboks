@@ -1,7 +1,6 @@
 ﻿namespace Taenkeboks
 open PIM
 open System
-
 //'S: Game
 //'A: Bet Option
 //'V: Visible information (for player)
@@ -71,6 +70,7 @@ type TaenkeboksActionInstance = {
 
 type TaenkeboksState =
     {
+        playerNames:String[]
         totalDiceLeft:int
         spec:TaenkeboksGameSpec
         currentBet:Bet
@@ -85,6 +85,7 @@ type TaenkeboksState =
 
 type PublicInformation =
     {
+        playerNames:string[]
         spec:TaenkeboksGameSpec
         nextPlayer:int
         diceLeft:int[]
@@ -308,13 +309,13 @@ module TaenkeboksAction =
     let print (a:TaenkeboksAction) = 
         if a.call then "Call"
         else Bet.print a.bet
-    
 module TaenkeboksState =
     let r = new System.Random()
-    let init(spec:TaenkeboksGameSpec) = 
+    let init(spec:TaenkeboksGameSpec) (playerNames:string[])= 
         if spec.playerCount < 2 then failwith "Player count < 2"
         let startingPlayer = r.Next() % spec.playerCount
         {
+            playerNames=playerNames
             spec=spec
             totalDiceLeft = spec.playerCount * spec.diceCount
             currentBet = Bet.startingBet
@@ -330,18 +331,19 @@ module TaenkeboksState =
 module PublicInformation =
     let create (s:TaenkeboksState) player = 
         {
-            spec=s.spec
+            playerNames = s.playerNames 
+            spec = s.spec
             nextPlayer = s.currentPlayer
             diceLeft = s.playerStates |> Array.map(fun p -> p.diceLeft)
-            playerCount= s.playerStates.Length
+            playerCount = s.playerStates.Length
             totalDiceLeft = s.totalDiceLeft
             choppingBlock = s.choppingBlock
-            currentBet=s.currentBet
+            currentBet = s.currentBet
             playersLeft = s.playersLeft
             actionHistory = s.actionHistory
             livesLeft = s.playerStates |> Array.map(fun p-> p.livesLeft)
             viewingPlayer = player
-            status=s.status
+            status = s.status
             playerHand = s.playerStates.[player].hand
         }
     let othersDice(v:PublicInformation) = 

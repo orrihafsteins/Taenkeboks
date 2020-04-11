@@ -157,7 +157,7 @@ module TaenkeboksGameSpace =
             advanceBet action.bet state
     let create (spec:TaenkeboksGameSpec):TaenkeboksGameSpace= 
         {
-            init = (fun () -> TaenkeboksState.init spec)   //(fun ps -> TaenkeboksState.init spec ps.Length)
+            init = (fun playerNames -> TaenkeboksState.init spec playerNames)   //(fun ps -> TaenkeboksState.init spec ps.Length)
             advance = advance
             validateAction = (fun (g:TaenkeboksState) s b -> 
                 if not g.status.inPlay then
