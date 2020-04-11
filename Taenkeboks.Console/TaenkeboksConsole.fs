@@ -3,7 +3,7 @@ open System
 open Taenkeboks
 
 module ConsolePlayer =
-    let create (space:TaenkeboksGameSpace) name : TaenkeboksPlayer = 
+    let create name : TaenkeboksPlayer = 
         let rec getMove (state:PublicInformation) =
             printf "Enter move %s: " name
             let move = Console.ReadLine();
@@ -12,13 +12,7 @@ module ConsolePlayer =
                 printfn "Could not parse move: %A" err.Message
                 getMove (state)  
             |  Ok oMove ->
-                let t = space.validateAction state state.currentPlayer oMove  
-                match t with
-                | OK -> oMove
-                | GameOver -> failwith "death"
-                | InvalidAction message ->
-                    printfn "Could not parse move: %A" message
-                    getMove (state) 
+                oMove
         {    
             playerName = name
             policy = (fun state ->
@@ -27,5 +21,4 @@ module ConsolePlayer =
             updatePlayer = (fun v -> 
                 v |> Json.serialize |> printfn "%s" 
             )
-            think = (fun v until-> ())
         } 

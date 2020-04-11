@@ -23,6 +23,7 @@ type PlayerState =
         hand:Hand
         diceLeft:int
         livesLeft:int
+        message:string
     }
 
 type Bet = {
@@ -76,7 +77,6 @@ type TaenkeboksState =
         currentBet:Bet
         choppingBlock:Side
         playersLeft:int
-        message:string
         currentPlayer:Side
         playerStates:PlayerState[]
         status:TaenkeboksStatus
@@ -135,12 +135,10 @@ module TaenkeboksGameSpec =
     let isSeries(spec:TaenkeboksGameSpec) (hand:Hand) = 
         if spec.oneIsSeries && hand = [|1|] then 
             true
-        elif spec.multiSeries && hand.Length > 1 && hand = ([| hand.[0]..hand.[0] + hand.Length - 1 |]) then
+        elif spec.multiSeries && hand.Length > 1 && hand = ([| hand.[0]..(hand.[0] + hand.Length) |]) then
             true
-        elif (spec.multiSeries |> not) && hand.Length > 1 && hand = ([| 1..hand.Length |]) then
-            true
-        else 
-            false
+        else (spec.multiSeries |> not) && hand.Length > 1 && hand = ([| 1..hand.Length |])
+            
 
 module Bet =
     let startingBet = {
@@ -277,23 +275,27 @@ module PlayerState =
             diceLeft = 0
             hand = [||]
             livesLeft = 0
+            message = ""
         }
     let init spec =
         {
             diceLeft = spec.diceCount
             hand = Hand.throwN spec.diceCount
             livesLeft = spec.extraLives + 1
+            message = "Game start"
         }
     let initRound spec lives=
         {
             diceLeft = if lives > 0 then spec.diceCount else 0
             hand = if lives > 0 then Hand.throwN spec.diceCount else [||]
             livesLeft = lives
+            message = "Round start"
         }
     let throw playerState:PlayerState = {playerState with hand = Hand.throwN playerState.diceLeft}
     let clear playerState:PlayerState = {playerState with hand = Array.empty}
     let win playerState:PlayerState = {playerState with hand = Array.empty; diceLeft = playerState.diceLeft - 1}
     let loseRound playerState:PlayerState = {playerState with livesLeft = playerState.livesLeft - 1}
+    let setMessage message playerState:PlayerState = {playerState with message = message}
 
 module TaenkeboksAction =
     let call bet=
@@ -321,12 +323,19 @@ module TaenkeboksState =
             currentBet = Bet.startingBet
             choppingBlock = -1
             playersLeft = spec.playerCount
-            message = ""
             currentPlayer = startingPlayer
             playerStates = Array.init spec.playerCount (fun i -> PlayerState.init spec)
             status = TaenkeboksStatus.initialStatus
             actionHistory = []
         }
+    let message msg side state =
+        // Add a message to a particular player
+        let playerStates = state.playerStates |> Array.mapi (fun i ps->
+            if i = side then
+                {ps with message = msg}
+            else ps            
+        )
+        {state with playerStates = playerStates}
 
 module PublicInformation =
     let create (s:TaenkeboksState) player = 

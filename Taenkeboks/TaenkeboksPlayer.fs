@@ -20,5 +20,4 @@ module TaenkeboksPlayer =
             playerName = name
             policy = policy
             updatePlayer = (fun v -> ())
-            think = (fun v until-> ())
         }   

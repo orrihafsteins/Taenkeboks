@@ -4,7 +4,7 @@ open System
 
 type TaenkeboksGameSpace = GameSpace<TaenkeboksState,TaenkeboksAction,PublicInformation>
 module TaenkeboksGameSpace =
-    let r = new System.Random()
+    let r = System.Random()
     let initPlayerStates (spec:TaenkeboksGameSpec) livesLeft= 
         livesLeft
         |> Array.mapi(fun i l-> PlayerState.initRound spec l)
@@ -36,7 +36,8 @@ module TaenkeboksGameSpace =
         let count, value = bet.count,bet.value
         let totalCount = countTotalValues state.spec value (state.playerStates |> Array.map (fun p -> p.hand))
         totalCount >= count
-    let highestStanding (state:TaenkeboksState) (bet:Bet)=
+    let highestStanding (state:TaenkeboksState) (bet:Bet) =
+        //Returns the bet with the highest count that has the same value as bet and the contributions to the count from each player
         let count, value = bet.count,bet.value
         let totalCount,contributions = countTotalValuesContributions state.spec value (state.playerStates |> Array.map (fun p -> p.hand))
         {
@@ -44,13 +45,11 @@ module TaenkeboksGameSpace =
             value=value
         },contributions
     let advanceBet(b:Bet) (state:TaenkeboksState): TaenkeboksState = 
-        let dtMove = DateTime.Now;
-        let currPlayer = state.playerStates.[state.currentPlayer]
         let nextPlayer =
             seq{1..state.spec.playerCount-1} 
             |> Seq.map(fun i -> (state.currentPlayer + i)%state.spec.playerCount)
             |> Seq.find(fun i -> state.playerStates.[i].diceLeft > 0)
-        
+        let playerStates = state.playerStates |> Array.map (fun ps -> ps |> PlayerState.setMessage (sprintf "%s raised %A" (state.playerNames.[state.currentPlayer]) b))
         {state with
             choppingBlock = state.currentPlayer
             currentBet = b
@@ -63,8 +62,16 @@ module TaenkeboksGameSpace =
                             bet=b
                         }
                 }::state.actionHistory
+            playerStates= playerStates
         }
-    let advanceRound (state:TaenkeboksState) (loser:int) (highestStanding:Bet) (contributions:int[]) : TaenkeboksState = 
+    let resolveBet (state:TaenkeboksState)  : TaenkeboksState = 
+        let currentBet = state.currentBet
+        let hStanding,contributions = highestStanding state currentBet
+        let loser =
+            if hStanding >= currentBet then //bet stands, current player loses
+                state.currentPlayer
+            else //betFails, choppingBlock loses
+                state.choppingBlock
         let spec = state.spec
         let mutable totalDiceLeft = state.totalDiceLeft
         let mutable playersLeft = state.playersLeft
@@ -88,7 +95,7 @@ module TaenkeboksGameSpace =
             )
         if playerStates |> Seq.sumBy(fun p -> p.diceLeft) <> totalDiceLeft then
             failwith "death"
-        let roundReport = RoundReport.lostRound state state.playerStates highestStanding loser playersLeft contributions
+        let roundReport = RoundReport.lostRound state state.playerStates hStanding loser playersLeft contributions
         
         let newState =
             if playersLeft > 1 then
@@ -141,61 +148,49 @@ module TaenkeboksGameSpace =
                 else 
                     failwith "death"
         newState
+    let legalActions g s =
+        if g.currentPlayer <> s then
+              Array.empty
+        else
+            let currentDice = g.playerStates |> Seq.map(fun p -> p.diceLeft) |> Seq.sum
+            let higherBets =
+                Bet.allLarger g.spec g.currentBet currentDice
+            let actions =
+                if g.currentBet = Bet.startingBet then
+                    Array.init(higherBets.Length)(fun i->
+                        TaenkeboksAction.raise (Bet.create higherBets.[i])
+                    )
+                else
+                    Array.init(higherBets.Length + 1)(fun i->
+                        if i = 0 then
+                            TaenkeboksAction.call g.currentBet
+                        else
+                            TaenkeboksAction.raise (Bet.create higherBets.[i - 1])
+                    )
+            actions    
     let advance (state:TaenkeboksState) (side:Side) (action:TaenkeboksAction):TaenkeboksState= 
-        if state.currentPlayer <> side then failwith "death"
-        if action.call then
-            let currentBet = state.currentBet
-            let hStanding,contributions = highestStanding state currentBet
-            let loser =
-                if hStanding >= currentBet then //bet stands, current player loses
-                    state.currentPlayer
-                else //betFails, choppingBlock loses
-                    state.choppingBlock
-            advanceRound state loser hStanding contributions
-        else    
-            if action.bet <= state.currentBet then failwith "bet must be larger"   
-            advanceBet action.bet state
+        let addMessage msg = TaenkeboksState.message msg side    
+        if not state.status.inPlay then
+            state |> addMessage "GameOver"
+        elif action.call && state.currentBet = Bet.startingBet then
+            state |> addMessage "Can't call initial bet"
+        elif state.currentPlayer <> side then
+            state |> addMessage "Not players turn"
+        elif (not action.call) && (action.bet<=state.currentBet) then
+            state |> addMessage "Raise must be larger"
+        else      
+            if action.call then 
+                resolveBet state
+            else    
+                advanceBet action.bet state     
     let create (spec:TaenkeboksGameSpec):TaenkeboksGameSpace= 
         {
             init = (fun playerNames -> TaenkeboksState.init spec playerNames)   //(fun ps -> TaenkeboksState.init spec ps.Length)
             advance = advance
-            validateAction = (fun (g:TaenkeboksState) s b -> 
-                if not g.status.inPlay then
-                    InvalidAction("Game over")
-                elif b.call && g.currentBet = Bet.startingBet then
-                    InvalidAction("Can't call initial bet")
-                elif g.currentPlayer <> s then
-                    InvalidAction("Not players turn")
-                elif (not b.call) && (b.bet<=g.currentBet) then
-                    InvalidAction("Raise must be larger")
-                else 
-                    OK
-            )//Game -> 'A -> bool
             visible = PublicInformation.create
             gameOver= (fun state -> not state.status.inPlay)
-            legalActions = 
-                (fun g s ->
-                    if g.currentPlayer <> s then
-                          Array.empty
-                    else
-                        let currentDice = g.playerStates |> Seq.map(fun p -> p.diceLeft) |> Seq.sum
-                        let higherBets =
-                            Bet.allLarger spec g.currentBet currentDice
-                        let actions =
-                            if g.currentBet = Bet.startingBet then
-                                Array.init(higherBets.Length)(fun i->
-                                    TaenkeboksAction.raise (Bet.create higherBets.[i])
-                                )
-                            else
-                                Array.init(higherBets.Length + 1)(fun i->
-                                    if i = 0 then
-                                        TaenkeboksAction.call g.currentBet
-                                    else
-                                        TaenkeboksAction.raise (Bet.create higherBets.[i - 1])
-                                )
-                        actions
-                )
-            checkTime = (fun g -> g,false)
+            
+            checkTime = (fun g -> g)
             nextPlayer = (fun g-> g.currentPlayer)
         }
 

@@ -19,37 +19,23 @@ type GameStatus =
     | InPlay
     | Winner of Side
     | Loser of Side 
-type ValidateActionResult = 
-    | OK
-    | GameOver
-    | InvalidAction of String
-    member this.message : String =
-        match this with
-        | OK -> "OK"
-        | GameOver -> "GameOver"
-        | InvalidAction(message) -> sprintf "Invalid Action: %s" message
 type Player<'V,'A> =
     {
         playerName:String
         policy:'V -> 'A
         updatePlayer: 'V -> unit
-        messagePlayer: string->unit
-        think:'V -> CancellationToken-> unit
     }
 
 type PlayerName = string
 type GameSpace<'S,'A,'V> = 
     {
         init: PlayerName[] -> 'S
-        advance:'S-> Side -> 'A -> 'S
-        legalActions: 'S -> Side -> 'A[]
-        validateAction:'S -> Side -> 'A -> ValidateActionResult
+        advance:'S-> Side -> 'A -> 'S // also handles invalid actions
         visible: 'S-> Side -> 'V
-        checkTime: 'S -> 'S*bool // returns true if state update
+        checkTime: 'S -> 'S
         gameOver: 'S -> bool
         nextPlayer: 'S -> Side
     }
-
 
 module Game =
     let play (space:GameSpace<'S,'A,'V>) (players:Player<'V,'A>[]) =
@@ -66,8 +52,6 @@ module Game =
                 let nextPlayer = players.[nextSide] 
                 let nextPlayerView = space.visible state nextSide
                 let nextPlayerMove = nextPlayer.policy nextPlayerView 
-                if space.validateAction state nextSide nextPlayerMove <> ValidateActionResult.OK then
-                    failwith "Invalid action" // should be validated and reported at client
                 let nextState =  space.advance state nextSide nextPlayerMove 
                 resolve nextState
         let initial = space.init (players |> Array.map (fun p -> p.playerName))

@@ -208,7 +208,6 @@ module AI =
             playerName = name
             policy=aggressiveStrategy spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff
             updatePlayer = (fun visible -> ())
-            think = (fun visible until -> ())
         }
     
     let createMinIncrementPlayer spec simLast name:Player<PublicInformation,TaenkeboksAction> =
@@ -216,7 +215,6 @@ module AI =
             playerName = name
             policy=minIncrementStrategy spec simLast
             updatePlayer = (fun visible -> ())
-            think = (fun visible until -> ())
         }
     
 
@@ -225,7 +223,6 @@ module AI =
             playerName = name
             policy=bestLocalIncrementStrategy spec simLast simNext
             updatePlayer = (fun visible -> ())
-            think = (fun visible until -> ())
         }
     let betProbs (visible:PublicInformation) maxCount =
         let n = 100
@@ -290,7 +287,6 @@ module AI =
                     let maxCount = min (max info.totalDiceLeft 6) 12
                     t <- betProbs info maxCount
             )
-            think = (fun visible until -> ())
         }
 
 
