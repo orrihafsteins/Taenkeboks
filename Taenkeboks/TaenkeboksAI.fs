@@ -9,10 +9,10 @@ module Simulator =
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
                 let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
-                let sampleCount = TbGameSpace.countTotalValues spec 0 hands
+                let sampleCount = TbGame.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TbGameSpace.countValues spec value
+            let countValues = TbGame.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
@@ -29,10 +29,10 @@ module Simulator =
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
                 let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
-                let sampleCount = TbGameSpace.countTotalValues spec 0 hands
+                let sampleCount = TbGame.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TbGameSpace.countValues spec value
+            let countValues = TbGame.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
@@ -289,4 +289,25 @@ module AI =
             )
         }
 
+type TbAiPlayer = Player<TbVisible,TbAction>
+module TbAiPlayer =
+    let createPlayer spec playerType name: TbAiPlayer =
+        let policy = 
+            match playerType with
+            | "local" -> AI.bestLocalIncrementStrategy spec 100 100
+            | "prior" -> AI.bestLocalWithPrior spec 100 100
+            | "min" -> AI.minIncrementStrategy spec 100
+            | "api" -> AI.panicStrategy
+            | "aggro" -> 
+                let maxOutragiousBet = 0.01
+                let minGoodBet = 0.8
+                let minPlausibleBet = 0.5 
+                let bluff = 0.3 
+                AI.aggressiveStrategy spec 100 100 maxOutragiousBet minGoodBet minPlausibleBet bluff
+            | _ -> failwith "death"
+        {
+            playerName = name
+            policy = policy
+            updatePlayer = (fun v -> ())
+        }   
 

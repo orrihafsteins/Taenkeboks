@@ -7,18 +7,19 @@ module Program =
     let main argv =
         printfn "--------------------------- TAENKEBOKS -------------------------------"
 
-        let playerCount = 2
+        let playerCount = 3
         let spec = TbGameSpec.initClassicRules playerCount
-        let spec = {spec with playerCount = playerCount;extraLives = 0;lastStanding=false;diceCount=1}
-        let space = TbGameSpace.create spec
+        let spec = {spec with playerCount = playerCount;extraLives = 1;lastStanding=true;diceCount=4}
+        let game = TbGame.create spec
         let players = 
             [|
-                TbPlayer.createPlayer spec "local" "local"
+                TbAiPlayer.createPlayer spec "local" "local"
+                TbAiPlayer.createPlayer spec "aggro" "aggro"
                 //TaenkeboksPlayer.createPlayer spec "min" "min"
                 ConsolePlayer.create "Orri"
             |]
         if players.Length <> playerCount then failwith "death"        
-        let game = PIM.Game.play space players
+        let game = PIM.Game.play game players
         
         printfn "------------------------- TAENKEBOKS END -----------------------------"
         let t = Console.In.Read()

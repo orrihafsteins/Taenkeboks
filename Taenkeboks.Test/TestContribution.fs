@@ -1,4 +1,4 @@
-﻿module Taenkeboks.TestGame
+﻿module Taenkeboks.TestContibution
 open PIM
 open NUnit.Framework
 

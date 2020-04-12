@@ -82,7 +82,7 @@ module StateView =
         }
 
 module ConsolePlayer =
-    let create name : TbPlayer = 
+    let create name : TbAiPlayer = 
         let parseMove s:Result<TbAction,Exception> =
             if s = "c" then
                 Ok TbAction.call 

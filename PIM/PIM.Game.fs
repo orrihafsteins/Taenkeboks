@@ -27,7 +27,7 @@ type Player<'V,'A> =
     }
 
 type PlayerName = string
-type GameSpace<'S,'A,'V> = 
+type Game<'S,'A,'V> = 
     {
         init: PlayerName[] -> 'S
         advance:'S-> Side -> 'A -> 'S // also handles invalid actions
@@ -38,53 +38,22 @@ type GameSpace<'S,'A,'V> =
     }
 
 module Game =
-    let play (space:GameSpace<'S,'A,'V>) (players:Player<'V,'A>[]) =
+    let play (game:Game<'S,'A,'V>) (players:Player<'V,'A>[]) =
         let updatePlayers state =
             Array.iteri (fun i p -> 
-                let visible= space.visible state i
+                let visible= game.visible state i
                 p.updatePlayer visible
             ) players
         let rec resolve state:'S =
             updatePlayers state
-            if space.gameOver state then state
+            if game.gameOver state then state
             else
-                let nextSide = space.nextPlayer state
+                let nextSide = game.nextPlayer state
                 let nextPlayer = players.[nextSide] 
-                let nextPlayerView = space.visible state nextSide
+                let nextPlayerView = game.visible state nextSide
                 let nextPlayerMove = nextPlayer.policy nextPlayerView 
-                let nextState =  space.advance state nextSide nextPlayerMove 
+                let nextState =  game.advance state nextSide nextPlayerMove 
                 resolve nextState
-        let initial = space.init (players |> Array.map (fun p -> p.playerName))
+        let initial = game.init (players |> Array.map (fun p -> p.playerName))
         resolve initial
         
-    
-// type Game<'S,'A,'V>(space:GameSpace<'S,'A,'V>,players:Player<'V,'A>[]) =
-//     let mutable gameState = space.init()
-//     member 
-//     member private this.UpdatePlayers () =
-//         Array.iteri (fun i p -> 
-//             let visible= space.visible gameState i
-//             p.updatePlayer visible
-//         ) players
-    
-//     member this.LegalActions side = space.legalActions gameState side
-//     member this.TryAction (side:Side) (action:'A) : String =
-//         if gameState |> space.gameOver then
-//             ValidateActionResult.GameOver.message;
-//         else     
-//             match space.validateAction gameState side action with
-//             | OK -> 
-//                 gameState <- space.advance gameState side action
-//                 null
-//             | r -> r.message
-//     member this.GameOver = gameState |> space.gameOver
-//     member this.Visible side = space.visible gameState side
-//     member this.CheckTime() = 
-//         let newGame,doUpdate = space.checkTime gameState
-//         gameState<-newGame
-//         if doUpdate then
-//             this.UpdatePlayers()
-//         doUpdate
-//     member this.PlayerNames = players |> Array.map (fun ps-> ps.playerName)
-//     member this.State = gameState
-    
