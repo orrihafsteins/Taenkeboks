@@ -1,11 +1,13 @@
 namespace Taenkeboks.Console
 open System
 open Taenkeboks
+
 type PlayerRoundReportView = {
     name:string
     dice:int[]
     contribution:int
 }
+
 type RoundReportView = {
     playerMadeBet:string
     playerCalledBet:string
@@ -16,22 +18,23 @@ type RoundReportView = {
 }
 
 module RoundReportView = 
-    let create (v:TaenkeboksVisible) :RoundReportView =
+    let create (v:TbVisible) :RoundReportView =
         let report = v.roundReport
         {
             playerMadeBet=v.playerNames.[report.playerMadeBet]
             players = Array.init v.playerCount (fun i -> {name=v.playerNames.[i];dice=report.playerDice.[i];contribution=report.playerContribution.[i]})
             playerCalledBet=v.playerNames.[report.playerCalledBet]
             playerLost=v.playerNames.[report.playerLost]
-            betCalled=report.betCalled |> Bet.print
-            betHighestStanding= report.betHighestStanding |> Bet.print
+            betCalled=report.betCalled |> TbBet.print
+            betHighestStanding= report.betHighestStanding |> TbBet.print
         }
 
 type GameReportView = {
     playerLost:string
 }
+
 module GameReportView = 
-    let create (v:TaenkeboksVisible) =
+    let create (v:TbVisible) =
         let report = v.gameReport
         {
             playerLost = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
@@ -41,8 +44,9 @@ type TournamentReportView = {
     playerWon:string
     playerLost:string
 }
+
 module TournamentReportView = 
-    let create (v:TaenkeboksVisible) =
+    let create (v:TbVisible) =
         let report = v.tournamentReport
         {
             playerLost = if report.playerLost >= 0 then v.playerNames.[report.playerLost] else ""
@@ -54,6 +58,7 @@ type PlayerStateView ={
     diceLeft: int
     livesLeft: int
 }    
+
 type StateView = {
         nextPlayer:string
         players:PlayerStateView[]
@@ -61,33 +66,34 @@ type StateView = {
         choppingBlock:string
         currentBet:string
         playerMessage:string
-        playerHand:Hand
+        playerHand:TbHand
 }
+
 module StateView = 
-    let create (info:TaenkeboksVisible) =
+    let create (info:TbVisible) =
         {
             nextPlayer = info.playerNames.[info.nextPlayer]
             players = Array.init info.playerCount (fun i -> {name=info.playerNames.[i];diceLeft=info.diceLeft.[i];livesLeft=info.livesLeft.[i]})
             totalDiceLeft = info.totalDiceLeft
             choppingBlock = if info.choppingBlock >= 0 then info.playerNames.[info.choppingBlock] else ""
-            currentBet = info.currentBet |> Bet.print
+            currentBet = info.currentBet |> TbBet.print
             playerMessage = info.playerMessage
             playerHand = info.playerHand
         }
 
 module ConsolePlayer =
-    let create name : TaenkeboksPlayer = 
-        let parseMove s:Result<TaenkeboksAction,Exception> =
+    let create name : TbPlayer = 
+        let parseMove s:Result<TbAction,Exception> =
             if s = "c" then
-                Ok TaenkeboksAction.call 
+                Ok TbAction.call 
             else 
                 try
-                    let count = Int32.Parse(string s.[0])
-                    let value = Int32.Parse(string s.[2])
-                    Ok (TaenkeboksAction.raise {count = count;value = value})
+                    let tokens = s.Split "d"
+                    let count = Int32.Parse(tokens.[0])
+                    let value = Int32.Parse(tokens.[1])
+                    Ok (TbAction.raise {count = count;value = value})
                 with 
                 | e -> Error e
-
         let rec getMove () =
             printf "Enter move %s: " name
             let sMove = Console.ReadLine();
@@ -106,11 +112,11 @@ module ConsolePlayer =
             )
             updatePlayer = (fun v -> 
                 printfn "----------------------------- UPDATE ---------------------------------"
-                if v.roundReport <> RoundReport.empty then
+                if v.roundReport <> TbRoundReport.empty then
                     v |> RoundReportView.create |> Json.serializeIndented |> printfn "%s" 
-                if v.gameReport <> GameReport.empty then
+                if v.gameReport <> TbGameReport.empty then
                     v |> GameReportView.create |> Json.serializeIndented |> printfn "%s"
-                if v.tournamentReport <> TournamentReport.empty then
+                if v.tournamentReport <> TbTournamentReport.empty then
                     v |> TournamentReportView.create |> Json.serializeIndented |> printfn "%s"
                 printfn "MESSAGE: %s" v.playerMessage
             )

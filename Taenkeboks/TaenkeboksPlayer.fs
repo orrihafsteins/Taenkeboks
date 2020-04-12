@@ -1,8 +1,8 @@
 ﻿namespace Taenkeboks
 open PIM
-type TaenkeboksPlayer = Player<TaenkeboksVisible,TaenkeboksAction>
-module TaenkeboksPlayer =
-    let createPlayer spec playerType name: TaenkeboksPlayer =
+type TbPlayer = Player<TbVisible,TbAction>
+module TbPlayer =
+    let createPlayer spec playerType name: TbPlayer =
         let policy = 
             match playerType with
             | "local" -> AI.bestLocalIncrementStrategy spec 100 100

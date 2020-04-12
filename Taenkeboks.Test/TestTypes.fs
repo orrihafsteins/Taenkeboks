@@ -19,7 +19,7 @@ let Bet_Comparison_LeftSmaller_Cases =
         BET_3D6, BET_4D3
     ]  |> List.map (fun (s,l) -> TestCaseData(s,l))
 [<TestCaseSource("Bet_Comparison_LeftSmaller_Cases")>]
-let Bet_Comparison_LeftSmaller (smaller:Bet) (larger:Bet) =
+let Bet_Comparison_LeftSmaller (smaller:TbBet) (larger:TbBet) =
     Assert.IsTrue(smaller<larger)
     
 

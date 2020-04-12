@@ -8,12 +8,12 @@ module Program =
         printfn "--------------------------- TAENKEBOKS -------------------------------"
 
         let playerCount = 2
-        let spec = TaenkeboksGameSpec.initClassicRules playerCount
-        let spec = {spec with playerCount = playerCount;extraLives = 0;lastStanding=false}
-        let space = TaenkeboksGameSpace.create spec
+        let spec = TbGameSpec.initClassicRules playerCount
+        let spec = {spec with playerCount = playerCount;extraLives = 0;lastStanding=false;diceCount=1}
+        let space = TbGameSpace.create spec
         let players = 
             [|
-                TaenkeboksPlayer.createPlayer spec "local" "local"
+                TbPlayer.createPlayer spec "local" "local"
                 //TaenkeboksPlayer.createPlayer spec "min" "min"
                 ConsolePlayer.create "Orri"
             |]

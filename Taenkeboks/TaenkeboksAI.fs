@@ -2,42 +2,42 @@
 open PIM
 module Simulator = 
     let r = new System.Random()
-    let sampleBet spec (hand:Hand) (otherDice:int[]) (n:int) (bet:Bet) =
+    let sampleBet spec (hand:TbHand) (otherDice:int[]) (n:int) (bet:TbBet) =
         let count,value = bet.count,bet.value
         let mutable wins = 0
         if value = 0 then
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
-                let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else Hand.throwN (otherDice.[i]))
-                let sampleCount = TaenkeboksGameSpace.countTotalValues spec 0 hands
+                let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
+                let sampleCount = TbGameSpace.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TaenkeboksGameSpace.countValues spec value
+            let countValues = TbGameSpace.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
                     otherDice 
-                    |> Seq.map (fun d -> Hand.throwN d |> countValues)
+                    |> Seq.map (fun d -> TbHand.throwN d |> countValues)
                     |> Seq.sum
                 let sampleCount = otherCount + myCount
                 if sampleCount >= count then wins <- wins + 1
         (float wins) / (float n)
-    let sampleBetWithBias spec (hand:Hand) (otherDice:int[]) (bias:int[]) (n:int) (bet:Bet) =
+    let sampleBetWithBias spec (hand:TbHand) (otherDice:int[]) (bias:int[]) (n:int) (bet:TbBet) =
         let count,value = bet.count,bet.value
         let mutable wins = 0
         if value = 0 then
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
-                let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else Hand.throwN (otherDice.[i]))
-                let sampleCount = TaenkeboksGameSpace.countTotalValues spec 0 hands
+                let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
+                let sampleCount = TbGameSpace.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TaenkeboksGameSpace.countValues spec value
+            let countValues = TbGameSpace.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
                     Seq.map2 (fun d b-> 
-                        let hand = Hand.throwN d
+                        let hand = TbHand.throwN d
                         if b > 0 then hand.[r.Next() % d]<-b
                         hand |> countValues
                     ) otherDice bias
@@ -45,55 +45,55 @@ module Simulator =
                 let sampleCount = otherCount + myCount
                 if sampleCount >= count then wins <- wins + 1
         (float wins) / (float n)
-    let sampleCurrentBet (g:TaenkeboksVisible) n =     
+    let sampleCurrentBet (g:TbVisible) n =     
         let otherDice = g.diceLeft |> Array.mapi (fun i x -> (i<>g.nextPlayer,x)) |> Array.filter fst |> Array.map snd
         sampleBet g.spec g.playerHand otherDice n g.currentBet
 module AI = 
     
     // if prob < 1 / players then call else minimum raise
-    let minIncrementStrategy spec simLast :(TaenkeboksVisible->TaenkeboksAction) = 
-        let bets = Bet.all spec
+    let minIncrementStrategy spec simLast :(TbVisible->TbAction) = 
+        let bets = TbBet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
             let target = 1.0 / (float info.playersLeft)
             if p < target then
-                TaenkeboksAction.call
+                TbAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
-                TaenkeboksAction.raise bets.[bi + 1]
+                TbAction.raise bets.[bi + 1]
         )
-    let panicStrategy:(TaenkeboksVisible->TaenkeboksAction) = 
+    let panicStrategy:(TbVisible->TbAction) = 
         (fun info -> 
             failwith "panic!"
         )
-    let minIncrementStrategy2 spec simLast :(TaenkeboksVisible->TaenkeboksAction) = 
-        let bets = Bet.all spec
+    let minIncrementStrategy2 spec simLast :(TbVisible->TbAction) = 
+        let bets = TbBet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
             let target = 0.25
             if p < target then
-                TaenkeboksAction.call
+                TbAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
-                TaenkeboksAction.raise bets.[bi + 1]
+                TbAction.raise bets.[bi + 1]
         )
-    let bestLocalIncrementStrategy spec simLast simNext:(TaenkeboksVisible->TaenkeboksAction) = 
-        let bets = Bet.all spec
+    let bestLocalIncrementStrategy spec simLast simNext:(TbVisible->TbAction) = 
+        let bets = TbBet.all spec
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
             let target = 1.0 / (float info.playersLeft)
             if p < target then
-                TaenkeboksAction.call
+                TbAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 let possible = bets.[bi+1..bi+1+6]
                 let otherDice = info.diceLeft |> Array.mapi (fun i x -> (i<>info.nextPlayer,x)) |> Array.filter fst |> Array.map snd
                 let probs = possible |> Array.map (Simulator.sampleBet spec info.playerHand otherDice simNext)
                 let bestI = probs |> Array.firstArgMax
-                TaenkeboksAction.raise possible.[bestI]
+                TbAction.raise possible.[bestI]
         )
-    let bestLocalWithPrior spec simLast simNext:(TaenkeboksVisible->TaenkeboksAction) = 
-        let bets = Bet.all spec
+    let bestLocalWithPrior spec simLast simNext:(TbVisible->TbAction) = 
+        let bets = TbBet.all spec
         (fun info -> 
             let predictedHands = Array.zeroCreate info.playerCount 
             let moveHistory = info.actionHistory |> Seq.map (fun a->a.action)
@@ -109,7 +109,7 @@ module AI =
             let p = Simulator.sampleCurrentBet info simLast
             let target = 1.0 / (float info.playersLeft)
             if p < target then
-                TaenkeboksAction.call
+                TbAction.call
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 let possible = bets.[bi+1..bi+1+6]
@@ -117,24 +117,24 @@ module AI =
                 let otherBias = predictedHands |> Array.mapi (fun i x -> (i<>info.nextPlayer,x)) |> Array.filter fst |> Array.map snd
                 let probs = possible |> Array.map (Simulator.sampleBetWithBias spec info.playerHand otherDice otherBias simNext)
                 let bestI = probs |> Array.firstArgMax
-                TaenkeboksAction.raise possible.[bestI]
+                TbAction.raise possible.[bestI]
         )
 
-    let aggressiveStrategy spec simLast simNext maxOutragiousBetProb minSafeBetProb minPlausibleBetProb bluffProb:(TaenkeboksVisible->TaenkeboksAction) = 
-        let bets = Bet.all spec
+    let aggressiveStrategy spec simLast simNext maxOutragiousBetProb minSafeBetProb minPlausibleBetProb bluffProb:(TbVisible->TbAction) = 
+        let bets = TbBet.all spec
         let r = new System.Random();
         (fun info -> 
             let p = Simulator.sampleCurrentBet info simLast
 //            let maxOutragiousBet = 0.1
             if p < maxOutragiousBetProb then
-                TaenkeboksAction.call
+                TbAction.call
             else
                 //let raiseTarget = 1.5 / (float info.playersLeft)
 //                let minGoodBet = 0.8
 //                let minPlausibleBet = 0.5         
 
                 let bi =    
-                    if info.currentBet = Bet.startingBet then 5
+                    if info.currentBet = TbBet.startingBet then 5
                     else bets |> Array.findIndex (fun b -> b = info.currentBet)
                 let bestValue = 
                     let notOnes = 
@@ -165,7 +165,7 @@ module AI =
                 let localBets = bets.[bi+1..] |> Array.filter (fun b -> b.count = info.currentBet.count && b.value <> bluffValue && b.value <> bestValue) 
                 let sampleSize = simNext / maxSampled
                 
-                let safeBluff: Bet option =
+                let safeBluff: TbBet option =
                     let bluffSample = bluffBets |> Array.take (min maxSampled bluffBets.Length)
                     let bluffProbs = bluffSample |> Array.map (Simulator.sampleBet spec info.playerHand otherDice sampleSize)
                     let iSafeBluffs = bluffProbs |> Array.filterI (fun p -> p > minSafeBetProb)
@@ -192,25 +192,25 @@ module AI =
                         |> Seq.filter (fun (i,p) -> p > minSafeBetProb)
                         |> Seq.minBy snd
                         |> fst
-                    elif info.currentBet = Bet.startingBet || bestProb > minPlausibleBetProb then
+                    elif info.currentBet = TbBet.startingBet || bestProb > minPlausibleBetProb then
                         probsI
                         |> Seq.maxBy snd
                         |> fst
                     else -1
                 if bestI >= 0 then
-                    TaenkeboksAction.raise possible.[bestI]
+                    TbAction.raise possible.[bestI]
                 else
-                    TaenkeboksAction.call
+                    TbAction.call
         )
 
-    let createAggressivePlayer spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff name:Player<TaenkeboksVisible,TaenkeboksAction> =
+    let createAggressivePlayer spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff name:Player<TbVisible,TbAction> =
         {
             playerName = name
             policy=aggressiveStrategy spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff
             updatePlayer = (fun visible -> ())
         }
     
-    let createMinIncrementPlayer spec simLast name:Player<TaenkeboksVisible,TaenkeboksAction> =
+    let createMinIncrementPlayer spec simLast name:Player<TbVisible,TbAction> =
         {   
             playerName = name
             policy=minIncrementStrategy spec simLast
@@ -218,18 +218,18 @@ module AI =
         }
     
 
-    let createLocIncrPlayer spec simLast simNext name:Player<TaenkeboksVisible,TaenkeboksAction> =
+    let createLocIncrPlayer spec simLast simNext name:Player<TbVisible,TbAction> =
         {
             playerName = name
             policy=bestLocalIncrementStrategy spec simLast simNext
             updatePlayer = (fun visible -> ())
         }
-    let betProbs (visible:TaenkeboksVisible) maxCount =
+    let betProbs (visible:TbVisible) maxCount =
         let n = 100
-        let othersDice = PublicInformation.othersDice visible
+        let othersDice = TbVisible.othersDice visible
         let hand = visible.playerHand
         let valueFreqs = Array.zeroCreate 7
-        if TaenkeboksGameSpec.isSeries visible.spec hand then
+        if TbGameSpec.isSeries visible.spec hand then
             for i in 1..6 do valueFreqs.[i] <- hand.Length + 1
             else 
                 hand 
@@ -250,7 +250,7 @@ module AI =
             else 
                 0.0
         )
-        let bets = Bet.all visible.spec
+        let bets = TbBet.all visible.spec
         let t = 
             bets
             |> Array.map (fun b -> 
@@ -263,7 +263,7 @@ module AI =
         t
 
         
-    let createCachedPlayer gameSpec name simLast simNext:Player<TaenkeboksVisible,TaenkeboksAction> = 
+    let createCachedPlayer gameSpec name simLast simNext:Player<TbVisible,TbAction> = 
         let mutable t = Array.empty //betProbs (visible:PublicInformation) maxCount          
         
         {
@@ -275,12 +275,12 @@ module AI =
                 //let p = Simulator.sampleCurrentBet info simLast
                 let target = 1.0 / (float info.playersLeft)
                 if bi > 0 && p < target then
-                    TaenkeboksAction.call
+                    TbAction.call
                 else
                     //let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                     let posB,posP = t.[bi+1..bi+1+6] |> Array.rev |> Array.unzip
                     let bestI = posP |> Array.firstArgMax
-                    TaenkeboksAction.raise posB.[bestI]
+                    TbAction.raise posB.[bestI]
             )
             updatePlayer = (fun info -> 
                 if info.choppingBlock = -1 then  
