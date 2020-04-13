@@ -36,7 +36,9 @@ type Game<'S,'A,'V> =
         gameOver: 'S -> bool
         nextPlayer: 'S -> Side
     }
-
+    static member StateType = typeof<'S>
+    static member VisibleType = typeof<'V>
+    static member ActionType = typeof<'A>
 module Game =
     let play (game:Game<'S,'A,'V>) (players:Player<'V,'A>[]) =
         let updatePlayers state =

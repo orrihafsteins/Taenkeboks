@@ -1,0 +1,40 @@
+﻿@page "{id:int}"
+@model PIM.Server.Pages.TaenkeboksModel
+@{
+    ViewData["Title"] = "Taenkeboks";
+}
+
+<span hidden id="gameID">@Model.GameID</span>
+
+<table id="game">
+    <tr id="playerRow"></tr>
+    <tr id="boardRow">
+        <td id="board" colspan=3>
+            <div class="t2" id="choppingBlock"></div>
+            <div class="t1" id="currentBet"></div>
+            <div class="t2" id="nextPlayer">
+                <span id="nextPlayerText"></span>
+                <button class="gameAction" id="restartButton">restart game</button>
+                <span id="callSpan">
+                    <button class="gameAction" id="callButton">call</button>
+                    - or -
+                </span>
+                <span id="raiseSpan">
+                    <select class="gameAction" id="raiseCounts"></select>
+                    of
+                    <select class="gameAction" id="raiseValues"></select>
+                    <button class="gameAction" id="raiseButton">raise</button>
+                </span>
+                <button class="gameAction" id="continueButton">continue</button>
+            </div>
+        </td>
+    </tr>
+    <tr id="selfRow"></tr>
+
+</table>
+
+
+@**@
+@*<button id="btn1">Make Bet</button>*@
+@*<div id=" "></div>*@
+@*<pre id="dump">dump</pre>*@

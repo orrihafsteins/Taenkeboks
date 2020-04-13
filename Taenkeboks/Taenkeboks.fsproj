@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <Compile Include="Util.fs" />
-    <Compile Include="TankeboksTypes.fs" />
+    <Compile Include="TaenkeboksTypes.fs" />
     <Compile Include="TaenkeboksGame.fs" />
     <Compile Include="TaenkeboksAI.fs" />
   </ItemGroup>
