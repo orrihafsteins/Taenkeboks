@@ -13,8 +13,8 @@ module Program =
         let game = TbGame.create spec
         let players = 
             [|
-                TbAiPlayer.createPlayer spec "local" "local"
-                TbAiPlayer.createPlayer spec "aggro" "aggro"
+                TbAiPlayer.createPlayer spec "Bob"
+                TbAiPlayer.createPlayer spec "Alice"
                 //TaenkeboksPlayer.createPlayer spec "min" "min"
                 ConsolePlayer.create "Orri"
             |]

@@ -33,6 +33,19 @@ namespace PIM.Server.DataModel
 
     }
 
+
+    public enum PlayerType
+    {
+        Async,
+        Cpu
+    }
+
+    public class PlayerSpec
+    {
+        public PlayerType PlayerType { get; set; }
+        public string PlayerName { get; set; }
+    }
+
     public class AsynchPlayers
     {
         private BlockingCollection<(int, TbAction)> _actionQueue;
@@ -118,27 +131,39 @@ namespace PIM.Server.DataModel
         Player<TbVisible, TbAction>[] _players;
         public static GameThread Example()
         {
-            string[] playerNames = new string[]
-            {
-                "Alice",
-                "Bob",
-                "Carol",
-                "Dan"
-            };
-            var asynchPlayers = new AsynchPlayers(playerNames).Players;
-            int playerCount = asynchPlayers.Length;
+
+            int playerCount = 4;
             var spec = TbGameSpecModule.initClassicRules(playerCount);
-            var game = TbGameModule.create(spec);
-            return new GameThread(
-                game,
-                asynchPlayers
-            );
-        }
             
-        public GameThread(Game<TbState,TbAction,TbVisible> game,Player<TbVisible,TbAction>[] players)
+            PlayerSpec[] players = new PlayerSpec[]
+            {
+                new PlayerSpec { PlayerType = PlayerType.Async, PlayerName = "orrihafsteins@gmail.com" },
+                new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Bob" },
+                new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Alice" },
+                new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Carol" }
+            };
+            return new GameThread(spec, players);
+        }
+
+        //public GameThread(Game<TbState, TbAction, TbVisible> game, Player<TbVisible, TbAction>[] players)
+        public GameThread(TbGameSpec spec, PlayerSpec[] players)
         {
-            _game = game;
-            _players = players;
+            //if (spec.playerCount >= players.Length) throw new Exception("Death");
+
+            var cpuPlayers = 
+                players
+                .Where(p => p.PlayerType == PlayerType.Cpu)
+                .Select(p=> TbAiPlayerModule.createPlayer(spec, p.PlayerName));
+            //new Player<TbVisible, TbAction>[]
+            //{
+            //    TbAiPlayerModule.createPlayer(spec,"local","Bob"),
+            //    TbAiPlayerModule.createPlayer(spec,"aggro","Alice"),
+            //    TbAiPlayerModule.createPlayer(spec,"min","Carol"),
+            //};
+            //var players = asynchPlayers.Concat(cpuPlayers).ToArray();
+            //var game = TbGameModule.create(spec);
+            //_game = game;
+            //_players = players;
         }
 
         private void GameLoop()

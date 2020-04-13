@@ -291,14 +291,14 @@ module AI =
 
 type TbAiPlayer = Player<TbVisible,TbAction>
 module TbAiPlayer =
-    let createPlayer spec playerType name: TbAiPlayer =
+    let createPlayer spec name: TbAiPlayer =
         let policy = 
-            match playerType with
-            | "local" -> AI.bestLocalIncrementStrategy spec 100 100
-            | "prior" -> AI.bestLocalWithPrior spec 100 100
-            | "min" -> AI.minIncrementStrategy spec 100
+            match name with
+            | "Bob" -> AI.bestLocalIncrementStrategy spec 100 100
+            | "Dan" -> AI.bestLocalWithPrior spec 100 100
+            | "Carol" -> AI.minIncrementStrategy spec 100
             | "api" -> AI.panicStrategy
-            | "aggro" -> 
+            | "Alice" -> 
                 let maxOutragiousBet = 0.01
                 let minGoodBet = 0.8
                 let minPlausibleBet = 0.5 
