@@ -5,9 +5,6 @@ open System.Threading
 //'S: Board state type (full game information)
 //'A: Action type
 //'V: Visible information
-//'R: Action report
-//'Status: Game status, (in play, game over, x won, y lost, etc.)
-
 
 type Side = int
 module Side = 
@@ -15,36 +12,33 @@ module Side =
     let X = 0
     let O = 1
     let other (s:int) = 1-s
+
 type GameStatus =
     | InPlay
     | Winner of Side
     | Loser of Side 
-type Player<'V,'A> =
-    {
-        playerName:String
-        policy:'V -> 'A
-        updatePlayer: 'V -> unit
-    }
+
+type IPlayer<'V,'A> =
+    abstract member playerName:String
+    abstract member policy: 'V -> 'A
+    abstract member update: 'V -> unit
 
 type PlayerName = string
-type Game<'S,'A,'V> = 
-    {
-        init: PlayerName[] -> 'S
-        advance:'S-> Side -> 'A -> 'S // also handles invalid actions
-        visible: 'S-> Side -> 'V
-        checkTime: 'S -> 'S
-        gameOver: 'S -> bool
-        nextPlayer: 'S -> Side
-    }
-    static member StateType = typeof<'S>
-    static member VisibleType = typeof<'V>
-    static member ActionType = typeof<'A>
-module Game =
-    let play (game:Game<'S,'A,'V>) (players:Player<'V,'A>[]) =
+
+type IGame<'S,'A,'V> = 
+    abstract member init: PlayerName[] -> 'S
+    abstract member advance:'S-> Side -> 'A -> 'S // also handles invalid actions
+    abstract member visible: 'S-> Side -> 'V
+    abstract member checkTime: 'S -> 'S
+    abstract member gameOver: 'S -> bool
+    abstract member nextPlayer: 'S -> Side
+
+module IGame =
+    let play (game:IGame<'S,'A,'V>) (players:IPlayer<'V,'A>[]) =
         let updatePlayers state =
-            Array.iteri (fun i p -> 
+            Array.iteri (fun i (p:IPlayer<'V,'A>) -> 
                 let visible= game.visible state i
-                p.updatePlayer visible
+                p.update visible
             ) players
         let rec resolve state:'S =
             updatePlayers state

@@ -2,8 +2,7 @@
 open PIM
 open System
 
-type TbGame = Game<TbState,TbAction,TbVisible>
-module TbGame =
+module TbRules = 
     let r = System.Random()
     let countValues spec value hand =
         if TbGameSpec.isSeries spec hand then hand.Length + 1
@@ -190,15 +189,17 @@ module TbGame =
                 resolveBet state
             else    
                 advanceBet action.bet state     
-    let create (spec:TbGameSpec):TbGame= 
+    
+type TbGame(spec:TbGameSpec)= 
+    static member create spec = 
         if not spec.lastStanding && spec.extraLives > 0 then failwith "Extra lives only when last standing"
-        {
-            init = (fun playerNames -> TbTaenkeboksState.create spec playerNames)   //(fun ps -> TaenkeboksState.init spec ps.Length)
-            advance = advance
-            visible = TbVisible.create
-            gameOver= (fun state -> not state.status.inPlay)
-            
-            checkTime = (fun g -> g)
-            nextPlayer = (fun g-> g.currentPlayer)
-        }
-
+        TbGame(spec)
+    interface IGame<TbState,TbAction,TbVisible> with
+        member this.init playerNames = TbTaenkeboksState.create spec playerNames   //(fun ps -> TaenkeboksState.init spec ps.Length)
+        member this.advance state side action = TbRules.advance state side action
+        member this.visible state side = TbVisible.create state side
+        member this.checkTime state = state
+        member this.gameOver state = not state.status.inPlay
+        member this.nextPlayer state = state.currentPlayer
+   
+    

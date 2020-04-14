@@ -1,5 +1,12 @@
 ﻿namespace Taenkeboks
 open PIM
+
+type TbPlayer(name:string,policy:TbVisible->TbAction,update:TbVisible->Unit) =
+    interface IPlayer<TbVisible,TbAction> with
+        member this.playerName = name
+        member this.policy v = policy v
+        member this.update v = update v
+
 module Simulator = 
     let r = new System.Random()
     let sampleBet spec (hand:TbHand) (otherDice:int[]) (n:int) (bet:TbBet) =
@@ -9,10 +16,10 @@ module Simulator =
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
                 let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
-                let sampleCount = TbGame.countTotalValues spec 0 hands
+                let sampleCount = TbRules.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TbGame.countValues spec value
+            let countValues = TbRules.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
@@ -29,10 +36,10 @@ module Simulator =
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
                 let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
-                let sampleCount = TbGame.countTotalValues spec 0 hands
+                let sampleCount = TbRules.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TbGame.countValues spec value
+            let countValues = TbRules.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
@@ -203,27 +210,6 @@ module AI =
                     TbAction.call
         )
 
-    let createAggressivePlayer spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff name:Player<TbVisible,TbAction> =
-        {
-            playerName = name
-            policy=aggressiveStrategy spec simLast simNext maxOutragiousBet minGoodBet minPlausibleBet bluff
-            updatePlayer = (fun visible -> ())
-        }
-    
-    let createMinIncrementPlayer spec simLast name:Player<TbVisible,TbAction> =
-        {   
-            playerName = name
-            policy=minIncrementStrategy spec simLast
-            updatePlayer = (fun visible -> ())
-        }
-    
-
-    let createLocIncrPlayer spec simLast simNext name:Player<TbVisible,TbAction> =
-        {
-            playerName = name
-            policy=bestLocalIncrementStrategy spec simLast simNext
-            updatePlayer = (fun visible -> ())
-        }
     let betProbs (visible:TbVisible) maxCount =
         let n = 100
         let othersDice = TbVisible.othersDice visible
@@ -262,12 +248,9 @@ module AI =
             )
         t
 
-    let createCachedPlayer gameSpec name simLast simNext:Player<TbVisible,TbAction> = 
+    let createCachedPlayer gameSpec name simLast simNext:TbPlayer = 
         let mutable t = Array.empty //betProbs (visible:PublicInformation) maxCount          
-        
-        {
-            playerName=name
-            policy = (fun info -> 
+        let policy info =
                 //let bets = t |> Array.map fst
                 let bi = t |> Array.findIndex (fun (b,p) -> b = info.currentBet)
                 let b,p = t.[bi]
@@ -280,17 +263,14 @@ module AI =
                     let posB,posP = t.[bi+1..bi+1+6] |> Array.rev |> Array.unzip
                     let bestI = posP |> Array.firstArgMax
                     TbAction.raise posB.[bestI]
-            )
-            updatePlayer = (fun info -> 
-                if info.choppingBlock = -1 then  
-                    let maxCount = min (max info.totalDiceLeft 6) 12
-                    t <- betProbs info maxCount
-            )
-        }
+        let update info = 
+            if info.choppingBlock = -1 then  
+                let maxCount = min (max info.totalDiceLeft 6) 12
+                t <- betProbs info maxCount
+        TbPlayer(name,policy,update)
 
-type TbAiPlayer = Player<TbVisible,TbAction>
 module TbAiPlayer =
-    let createPlayer spec name: TbAiPlayer =
+    let createPlayer spec name: TbPlayer =
         let policy = 
             match name with
             | "Bob" -> AI.bestLocalIncrementStrategy spec 100 100
@@ -304,9 +284,6 @@ module TbAiPlayer =
                 let bluff = 0.3 
                 AI.aggressiveStrategy spec 100 100 maxOutragiousBet minGoodBet minPlausibleBet bluff
             | _ -> failwith "death"
-        {
-            playerName = name
-            policy = policy
-            updatePlayer = (fun v -> ())
-        }   
+        TbPlayer(name,policy,(fun v -> ()))
+        
 

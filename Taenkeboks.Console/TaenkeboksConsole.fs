@@ -82,7 +82,7 @@ module StateView =
         }
 
 module ConsolePlayer =
-    let create name : TbAiPlayer = 
+    let create name : IPlayer<TbVisible,TbAction> = 
         let parseMove s:Result<TbAction,Exception> =
             if s = "c" then
                 Ok TbAction.call 
@@ -103,14 +103,11 @@ module ConsolePlayer =
                 getMove ()  
             |  Ok move ->
                 move
-        {    
-            playerName = name
-            policy = (fun v ->
-                printfn "----------------------------- GET MOVE -------------------------------"
-                v |> StateView.create |> Json.serializeIndented |> printfn "%s" 
-                getMove ()
-            )
-            updatePlayer = (fun v -> 
+        let policy v =
+            printfn "----------------------------- GET MOVE -------------------------------"
+            v |> StateView.create |> Json.serializeIndented |> printfn "%s" 
+            getMove ()
+        let update v =
                 printfn "----------------------------- UPDATE ---------------------------------"
                 if v.roundReport <> TbRoundReport.empty then
                     v |> RoundReportView.create |> Json.serializeIndented |> printfn "%s" 
@@ -119,5 +116,8 @@ module ConsolePlayer =
                 if v.tournamentReport <> TbTournamentReport.empty then
                     v |> TournamentReportView.create |> Json.serializeIndented |> printfn "%s"
                 printfn "MESSAGE: %s" v.playerMessage
-            )
-        } 
+        TbPlayer(name,policy,update)
+    open PIM
+    let test:IPlayer<TbVisible,TbAction> = TbPlayer(name,policy,update) :?> IPlayer<TbVisible,TbAction>
+
+
