@@ -262,7 +262,6 @@ module AI =
             )
         t
 
-        
     let createCachedPlayer gameSpec name simLast simNext:Player<TbVisible,TbAction> = 
         let mutable t = Array.empty //betProbs (visible:PublicInformation) maxCount          
         
