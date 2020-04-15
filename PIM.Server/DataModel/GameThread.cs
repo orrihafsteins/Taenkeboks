@@ -34,7 +34,6 @@ namespace PIM.Server.DataModel
 
     }
 
-
     public enum PlayerType
     {
         Async,
@@ -75,7 +74,7 @@ namespace PIM.Server.DataModel
         //public GameThread(Game<TbState, TbAction, TbVisible> game, Player<TbVisible, TbAction>[] players)
         public GameThread(TbGameSpec spec, PlayerSpec[] playerSpecs)
         {
-            if (spec.playerCount >= playerSpecs.Length) throw new Exception("Death");
+            if (spec.playerCount != playerSpecs.Length) throw new Exception("Death");
             _actionQueue = Channel.CreateUnbounded<(int, TbAction)>();
             _visibleQueues = playerSpecs.Select(n => Channel.CreateUnbounded<TbVisible>()).ToArray();
             _visibleCurrent = playerSpecs.Select(n => (TbVisible)null).ToArray();
@@ -85,9 +84,9 @@ namespace PIM.Server.DataModel
                 switch (ps.PlayerType)
                 {
                     case PlayerType.Async:
-                        return TbAiPlayerModule.createPlayer(spec, ps.PlayerName);
+                        return CreateAsyncPlayer(i, ps.PlayerName);
                     case PlayerType.Cpu:
-                        return CreatePAsynclayer(i,ps.PlayerName);
+                        return TbAiPlayerModule.createPlayer(spec, ps.PlayerName);
                     default:
                         throw new Exception("Death");
                 }
@@ -95,8 +94,6 @@ namespace PIM.Server.DataModel
             _game = TbGameModule.create(spec);
             _players = players;
         }
-
-
 
         private void GameLoop()
         {
@@ -127,20 +124,9 @@ namespace PIM.Server.DataModel
             await _actionQueue.Writer.WriteAsync((pIndex, action));
         }
 
-        private async Task<TbAction> GetPlayerAction(int pSide)
+        public TbVisible GetPlayerVisible(string playerName)//Immediately returns with the next or current state
         {
-            (int aSide, TbAction a) = await _actionQueue.Reader.ReadAsync();
-            while (pSide != aSide) (aSide, a) = await _actionQueue.Reader.ReadAsync(); //Silently ignore actions from other players?!
-            return a;
-        }
-
-        private async Task SetPlayerVisible(int pIndex, TbVisible v)
-        {
-            await _visibleQueues[pIndex].Writer.WriteAsync(v);
-        }
-
-        public TbVisible GetPlayerVisible(int pIndex)//Immediately returns with the next or current state
-        {
+            int pIndex = PlayerIndex(playerName);
             if (_visibleQueues[pIndex].Reader.TryRead(out TbVisible next))
             {
                 return next;
@@ -149,21 +135,25 @@ namespace PIM.Server.DataModel
                 return _visibleCurrent[pIndex];
         }
 
-        public async Task<TbVisible> GetNextPlayerVisible(int pIndex)//awaits until a new visible state for player is available
+        public async Task<TbVisible> GetNextPlayerVisible(string playerName)//awaits until a new visible state for player is available
         {
+            int pIndex = PlayerIndex(playerName);
             return await _visibleQueues[pIndex].Reader.ReadAsync();
         }
 
-        private Player<TbVisible, TbAction> CreatePAsynclayer(int pIndex,string playerName)
+        private Player<TbVisible, TbAction> CreateAsyncPlayer(int pIndex,string playerName)
         {
             Unit unit = (Unit)Activator.CreateInstance(typeof(Unit), true);
-            Func<TbVisible, TbAction> policy = (a) =>
+            Func<TbVisible, TbAction> policy = (v) =>
             {
-                return GetPlayerAction(pIndex);
+                //TODO: make player interface async
+                (int aSide, TbAction a) = _actionQueue.Reader.ReadAsync().AsTask().Result; // These should block the game thread by design
+                while (pIndex != aSide) (aSide, a) = _actionQueue.Reader.ReadAsync().AsTask().Result; //Silently ignore actions from other players?!
+                return a;
             };
             Func<TbVisible, Unit> update = (v) =>
             {
-                SetPlayerVisible(pIndex, v);
+                _visibleQueues[pIndex].Writer.WriteAsync(v).AsTask().Wait();
                 return unit;
             };
             return new Player<TbVisible, TbAction>(

@@ -23,19 +23,35 @@ namespace PIM.Server.Controllers
         private static GameThread _gameThread = GameThread.Example();
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger _logger;
+        static PlayApiController()//Replace with game manager
+        {
+            _gameThread.StartGame();
+        }
         public PlayApiController(SignInManager<IdentityUser> signInManager, ILogger<PlayApiController> logger)
         {
             _signInManager = signInManager;
             _logger = logger;
-            _gameThread.StartGame();
         }
         [HttpGet("current")]
         [ProducesResponseType(200, Type = typeof(string))]
         [ProducesResponseType(404)]
-        public IActionResult Get(string gameName, string id)
+        public string Current(string gameName, string id)
         {
             string playerName = _signInManager.UserManager.GetUserName(this.User);
-            return Ok($"CurrentState of {gameName} {id}");
+            var v = _gameThread.GetPlayerVisible(playerName);
+            var jv = Taenkeboks.Json.serializeIndented(v);
+            return jv;
+        }
+        
+        [HttpGet("next")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesResponseType(404)]
+        public string Next(string gameName, string id)
+        {
+            string playerName = _signInManager.UserManager.GetUserName(this.User);
+            var v = _gameThread.GetNextPlayerVisible(playerName);
+            var jv = Taenkeboks.Json.serializeIndented(v);
+            return jv;
         }
 
         //[HttpPost("{id}")]
