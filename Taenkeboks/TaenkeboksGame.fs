@@ -175,21 +175,22 @@ module TbGame =
                             TbAction.raise (TbBet.create higherBets.[i - 1])
                     )
             actions    
-    let advance (state:TbState) (side:Side) (action:TbAction):TbState= 
-        let setPlayerMessage msg = TbTaenkeboksState.messagePlayer msg side    
+    let advance (state:TbState) (side:Side) (action:TbAction):AdvanceResult<TbState>= 
         if not state.status.inPlay then
-            state |> setPlayerMessage "GameOver"
+            AdvanceResult.GameOver
+        elif side <> state.currentPlayer then
+            AdvanceResult.WrongTurn
         elif action.call && state.currentBet = TbBet.startingBet then
-            state |> setPlayerMessage "Can't call initial bet"
+            AdvanceResult.InvalidMove "Can't call initial bet"
         elif state.currentPlayer <> side then
-            state |> setPlayerMessage "Not players turn"
+            AdvanceResult.InvalidMove "Not players turn"
         elif (not action.call) && (action.bet<=state.currentBet) then
-            state |> setPlayerMessage "Raise must be larger"
+            AdvanceResult.InvalidMove "Raise must be larger"
         else      
             if action.call then 
-                resolveBet state
+                AdvanceResult.Ok (resolveBet state)
             else    
-                advanceBet action.bet state     
+                AdvanceResult.Ok (advanceBet action.bet state)
     let create (spec:TbGameSpec):TbGame= 
         if not spec.lastStanding && spec.extraLives > 0 then failwith "Extra lives only when last standing"
         {
@@ -197,8 +198,7 @@ module TbGame =
             advance = advance
             visible = TbVisible.create
             gameOver= (fun state -> not state.status.inPlay)
-            
-            checkTime = (fun g -> g)
-            nextPlayer = (fun g-> g.currentPlayer)
+            nextSide = (fun state -> state.currentPlayer)
+            checkTime = (fun g -> NoChange)
         }
 

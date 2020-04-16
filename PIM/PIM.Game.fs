@@ -27,35 +27,48 @@ type Player<'V,'A> =
     }
 
 type PlayerName = string
+
+type AdvanceResult<'S> = 
+    | Ok of 'S //advance ok
+    | GameOver //game already over
+    | WrongTurn //not acting players turn
+    | InvalidMove of string 
+
+type CheckTimeResult<'S> = 
+    | NoChange
+    | StateChange of 'S
+
 type Game<'S,'A,'V> = 
     {
         init: PlayerName[] -> 'S
-        advance:'S-> Side -> 'A -> 'S // also handles invalid actions
+        advance:'S-> Side -> 'A -> AdvanceResult<'S> // also handles invalid actions
         visible: 'S-> Side -> 'V
-        checkTime: 'S -> 'S
+        checkTime: 'S -> CheckTimeResult<'S>
         gameOver: 'S -> bool
-        nextPlayer: 'S -> Side
+        nextSide: 'S -> Side
     }
-    static member StateType = typeof<'S>
-    static member VisibleType = typeof<'V>
-    static member ActionType = typeof<'A>
-module Game =
-    let play (game:Game<'S,'A,'V>) (players:Player<'V,'A>[]) =
-        let updatePlayers state =
-            Array.iteri (fun i p -> 
-                let visible= game.visible state i
-                p.updatePlayer visible
-            ) players
-        let rec resolve state:'S =
-            updatePlayers state
-            if game.gameOver state then state
-            else
-                let nextSide = game.nextPlayer state
-                let nextPlayer = players.[nextSide] 
-                let nextPlayerView = game.visible state nextSide
-                let nextPlayerMove = nextPlayer.policy nextPlayerView 
-                let nextState =  game.advance state nextSide nextPlayerMove 
-                resolve nextState
-        let initial = game.init (players |> Array.map (fun p -> p.playerName))
-        resolve initial
+ module Game =
+     let play (game:Game<'S,'A,'V>) (players:Player<'V,'A>[]) =
+         let updatePlayers state =
+             Array.iteri (fun i p -> 
+                 let visible= game.visible state i
+                 p.updatePlayer visible
+             ) players
+         let rec resolve state:'S =
+             updatePlayers state
+             if game.gameOver state then state
+             else
+                 let nextSide = game.nextSide state
+                 let nextPlayer = players.[nextSide] 
+                 let nextPlayerView = game.visible state nextSide
+                 let nextPlayerMove = nextPlayer.policy nextPlayerView 
+                 let nextState =  
+                     match game.advance state nextSide nextPlayerMove with
+                     | Ok s -> s //advance ok
+                     | GameOver -> state
+                     | WrongTurn -> state
+                     | InvalidMove s -> state
+                 resolve nextState
+         let initial = game.init (players |> Array.map (fun p -> p.playerName))
+         resolve initial
         

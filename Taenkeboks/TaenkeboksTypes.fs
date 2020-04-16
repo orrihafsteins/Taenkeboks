@@ -321,14 +321,14 @@ module TbTaenkeboksState =
             gameReport = TbGameReport.empty
             tournamentReport = TbTournamentReport.empty
         }
-    let messagePlayer msg side state =
-        // Add a message to a particular player
-        let playerStates = state.playerStates |> Array.mapi (fun i ps->
-            if i = side then
-                {ps with message = msg}
-            else ps            
-        )
-        {state with playerStates = playerStates}
+    // let messagePlayer msg side state =
+    //     // Add a message to a particular player
+    //     let playerStates = state.playerStates |> Array.mapi (fun i ps->
+    //         if i = side then
+    //             {ps with message = msg}
+    //         else ps            
+    //     )
+    //     {state with playerStates = playerStates}
 
 module TbVisible =
     let create (s:TbState) player = 

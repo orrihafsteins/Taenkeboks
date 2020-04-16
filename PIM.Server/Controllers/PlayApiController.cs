@@ -20,6 +20,7 @@ namespace PIM.Server.Controllers
     [Authorize]
     public class PlayApiController : Controller
     {
+
         private static GameThread _gameThread = GameThread.Example();
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger _logger;
