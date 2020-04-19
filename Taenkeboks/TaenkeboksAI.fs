@@ -290,20 +290,21 @@ module AI =
 
 type TbAiPlayer = Player<TbVisible,TbAction>
 module TbAiPlayer =
+    let createPolicy spec name = 
+        match name with
+        | "Bob" -> AI.bestLocalIncrementStrategy spec 100 100
+        | "Dan" -> AI.bestLocalWithPrior spec 100 100
+        | "Carol" -> AI.minIncrementStrategy spec 100
+        | "api" -> AI.panicStrategy
+        | "Alice" -> 
+            let maxOutragiousBet = 0.01
+            let minGoodBet = 0.8
+            let minPlausibleBet = 0.5 
+            let bluff = 0.3 
+            AI.aggressiveStrategy spec 100 100 maxOutragiousBet minGoodBet minPlausibleBet bluff
+        | _ -> failwith (sprintf "Unknown ai policy %s" name)
     let createPlayer spec name: TbAiPlayer =
-        let policy = 
-            match name with
-            | "Bob" -> AI.bestLocalIncrementStrategy spec 100 100
-            | "Dan" -> AI.bestLocalWithPrior spec 100 100
-            | "Carol" -> AI.minIncrementStrategy spec 100
-            | "api" -> AI.panicStrategy
-            | "Alice" -> 
-                let maxOutragiousBet = 0.01
-                let minGoodBet = 0.8
-                let minPlausibleBet = 0.5 
-                let bluff = 0.3 
-                AI.aggressiveStrategy spec 100 100 maxOutragiousBet minGoodBet minPlausibleBet bluff
-            | _ -> failwith "death"
+        let policy = createPolicy spec name
         {
             playerName = name
             policy = policy

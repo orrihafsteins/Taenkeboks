@@ -1,6 +1,11 @@
 namespace Taenkeboks.Console
 open System
+open System.IO
+open System.Threading
+open System.Threading.Tasks
+open PIM
 open Taenkeboks
+
 
 type PlayerRoundReportView = {
     name:string
@@ -81,27 +86,27 @@ module StateView =
             playerHand = info.playerHand
         }
 
-module ConsolePlayer =
+module TbConsolePlayer =
+    let parseMove s:Result<TbAction,Exception> =
+        if s = "c" then
+            Result.Ok TbAction.call 
+        else 
+            try
+                let tokens = s.Split "d"
+                let count = Int32.Parse(tokens.[0])
+                let value = Int32.Parse(tokens.[1])
+                Result.Ok (TbAction.raise {count = count;value = value})
+            with 
+            | e -> Error e
     let create name : TbAiPlayer = 
-        let parseMove s:Result<TbAction,Exception> =
-            if s = "c" then
-                Ok TbAction.call 
-            else 
-                try
-                    let tokens = s.Split "d"
-                    let count = Int32.Parse(tokens.[0])
-                    let value = Int32.Parse(tokens.[1])
-                    Ok (TbAction.raise {count = count;value = value})
-                with 
-                | e -> Error e
         let rec getMove () =
             printf "Enter move %s: " name
             let sMove = Console.ReadLine();
             match parseMove sMove with
-            | Error err -> 
+            | Result.Error err -> 
                 printfn "Could not parse move: %A" err.Message
                 getMove ()  
-            |  Ok move ->
+            |  Result.Ok move ->
                 move
         {    
             playerName = name
@@ -121,3 +126,33 @@ module ConsolePlayer =
                 printfn "MESSAGE: %s" v.playerMessage
             )
         } 
+    let asyncPlay (asyncPlayer:AsyncPlayer<TbVisible,TbAction>):Async<unit> = 
+        async {
+            let rec getMove ():Async<TbAction> =
+                async {
+                    printf "Enter move %s: " asyncPlayer.Name
+                    let! sMove = Console.In.ReadLineAsync() |> Async.AwaitTask
+                    match parseMove sMove with
+                    | Result.Error err -> 
+                        printfn "Could not parse move: %A" err.Message
+                        return! getMove ()  
+                    |  Result.Ok move ->
+                        return move
+                }
+            printfn "Started player %s" asyncPlayer.Name
+            while asyncPlayer.Next().IsCompleted |> not do
+                let! v = asyncPlayer.Next().AsTask() |> Async.AwaitTask
+                printfn "----------------------------- UPDATE ---------------------------------"
+                if v.roundReport <> TbRoundReport.empty then
+                    v |> RoundReportView.create |> Json.serializeIndented |> printfn "%s" 
+                if v.gameReport <> TbGameReport.empty then
+                    v |> GameReportView.create |> Json.serializeIndented |> printfn "%s"
+                if v.tournamentReport <> TbTournamentReport.empty then
+                    v |> TournamentReportView.create |> Json.serializeIndented |> printfn "%s"
+                printfn "MESSAGE: %s" v.playerMessage
+                if v.nextPlayer = asyncPlayer.Side then
+                    printfn "----------------------------- GET MOVE -------------------------------"
+                    v |> StateView.create |> Json.serializeIndented |> printfn "%s" 
+                    let! action = getMove ()
+                    do! asyncPlayer.PerformAction(action).AsTask() |> Async.AwaitTask
+        }
