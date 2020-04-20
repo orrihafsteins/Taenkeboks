@@ -9,6 +9,7 @@
     <Compile Include="TaenkeboksTypes.fs" />
     <Compile Include="TaenkeboksGame.fs" />
     <Compile Include="TaenkeboksAI.fs" />
+    <Compile Include="TaenkeboksConsole.fs" />
   </ItemGroup>
 
   <ItemGroup>

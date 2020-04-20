@@ -79,7 +79,10 @@ module TbGame =
                 let r =
                     if index <> loser then
                         if p.diceLeft = 0 then
-                            p
+                            let raising = state.playerNames.[state.choppingBlock]
+                            let calling = state.playerNames.[state.currentPlayer]
+                            let losing = state.playerNames.[loser]
+                            p |> TbPlayerState.setMessage (sprintf "%s called %s's bet of %s. %s lost. " calling raising (currentBet |> TbBet.print) losing)
                         else
                             p |> TbPlayerState.surviveRound
                     else

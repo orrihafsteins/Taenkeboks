@@ -33,6 +33,18 @@ type AdvanceResult<'S> =
     | GameOver //game already over
     | WrongTurn //not acting players turn
     | InvalidMove of string 
+    member this.TryOk(state:'S byref) =
+        match this with
+        | Ok s -> 
+            state <- s
+            true
+        | _ -> false
+    member this.Message:string =
+        match this with
+        | Ok s -> "Ok"
+        | GameOver -> "Game Over"
+        | WrongTurn -> "Not players turn"
+        | InvalidMove  e -> (sprintf "Invalid move: %s" e)
 
 type CheckTimeResult<'S> = 
     | NoChange

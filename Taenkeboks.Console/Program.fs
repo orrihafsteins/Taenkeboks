@@ -5,17 +5,6 @@ open System.Threading.Tasks
 open Taenkeboks
 open PIM
 
-module TbAiPlayerAsync =
-    let play (asyncPlayer:AsyncPlayer<TbVisible,TbAction>) (policy:TbVisible->TbAction): Async<unit>= 
-        async {
-            printfn "Started player %s" asyncPlayer.Name            
-            while asyncPlayer.Next().IsCompleted |> not do
-                let! visible = asyncPlayer.Next().AsTask() |> Async.AwaitTask
-                if visible.nextPlayer = asyncPlayer.Side then
-                    let action = policy visible
-                    do! asyncPlayer.PerformAction(action).AsTask() |> Async.AwaitTask
-        }
-
 type PlayerType =
     | Cpu
     | Console    
