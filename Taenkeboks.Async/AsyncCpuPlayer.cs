@@ -24,7 +24,7 @@ namespace Taenkeboks.Async
                 var v = await _p.Next();
                 while (v.status.inPlay)
                 {
-                    if (v.nextPlayer == _p.Side)
+                    if (v.nextSide == _p.Side)
                     {
                         var a = _policy(v);
                         await _p.PerformAction(a);

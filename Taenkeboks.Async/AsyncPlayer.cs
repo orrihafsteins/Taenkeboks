@@ -27,11 +27,14 @@ namespace Taenkeboks.Async
         public V Last() //Called by client
         {
             return _lastVisible;
-        }
+        }   
         public V Current() //Called by client
         {
             if (_visible.Reader.TryRead(out V visible))
+            {
+                _lastVisible = visible;
                 return visible;
+            }
             else
                 return _lastVisible;
         }

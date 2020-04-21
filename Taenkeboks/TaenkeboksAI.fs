@@ -9,10 +9,10 @@ module Simulator =
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
                 let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
-                let sampleCount = TbGame.countTotalValues spec 0 hands
+                let sampleCount = TbRules.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TbGame.countValues spec value
+            let countValues = TbRules.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
@@ -29,10 +29,10 @@ module Simulator =
             if spec.ofAnyKind |> not then failwith "death"
             for i in 1..n do
                 let hands = Array.init (otherDice.Length+1) (fun i -> if i = otherDice.Length then hand else TbHand.throwN (otherDice.[i]))
-                let sampleCount = TbGame.countTotalValues spec 0 hands
+                let sampleCount = TbRules.countTotalValues spec 0 hands
                 if sampleCount >= count then wins <- wins + 1
         else
-            let countValues = TbGame.countValues spec value
+            let countValues = TbRules.countValues spec value
             let myCount = countValues hand
             for i in 1..n do
                 let otherCount = 
@@ -46,7 +46,7 @@ module Simulator =
                 if sampleCount >= count then wins <- wins + 1
         (float wins) / (float n)
     let sampleCurrentBet (g:TbVisible) n =     
-        let otherDice = g.diceLeft |> Array.mapi (fun i x -> (i<>g.nextPlayer,x)) |> Array.filter fst |> Array.map snd
+        let otherDice = g.diceLeft |> Array.mapi (fun i x -> (i<>g.nextSide,x)) |> Array.filter fst |> Array.map snd
         sampleBet g.spec g.playerHand otherDice n g.currentBet
 module AI = 
     
@@ -87,7 +87,7 @@ module AI =
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 let possible = bets.[bi+1..bi+1+6]
-                let otherDice = info.diceLeft |> Array.mapi (fun i x -> (i<>info.nextPlayer,x)) |> Array.filter fst |> Array.map snd
+                let otherDice = info.diceLeft |> Array.mapi (fun i x -> (i<>info.nextSide,x)) |> Array.filter fst |> Array.map snd
                 let probs = possible |> Array.map (Simulator.sampleBet spec info.playerHand otherDice simNext)
                 let bestI = probs |> Array.firstArgMax
                 TbAction.raise possible.[bestI]
@@ -113,8 +113,8 @@ module AI =
             else
                 let bi = bets |> Array.findIndex (fun b -> b = info.currentBet)
                 let possible = bets.[bi+1..bi+1+6]
-                let otherDice = info.diceLeft |> Array.mapi (fun i x -> (i<>info.nextPlayer,x)) |> Array.filter fst |> Array.map snd
-                let otherBias = predictedHands |> Array.mapi (fun i x -> (i<>info.nextPlayer,x)) |> Array.filter fst |> Array.map snd
+                let otherDice = info.diceLeft |> Array.mapi (fun i x -> (i<>info.nextSide,x)) |> Array.filter fst |> Array.map snd
+                let otherBias = predictedHands |> Array.mapi (fun i x -> (i<>info.nextSide,x)) |> Array.filter fst |> Array.map snd
                 let probs = possible |> Array.map (Simulator.sampleBetWithBias spec info.playerHand otherDice otherBias simNext)
                 let bestI = probs |> Array.firstArgMax
                 TbAction.raise possible.[bestI]
@@ -157,7 +157,7 @@ module AI =
                 
                 //let maxBet = min (bets.Length - 1) (bi+1+48)
                 //let possible = bets.[bi+1..maxBet]
-                let otherDice = info.diceLeft |> Array.mapi (fun i x -> (i<>info.nextPlayer,x)) |> Array.filter fst |> Array.map snd
+                let otherDice = info.diceLeft |> Array.mapi (fun i x -> (i<>info.nextSide,x)) |> Array.filter fst |> Array.map snd
                 
                 let maxSampled = 6;
                 let bestBets = bets.[bi+1..] |> Array.filter (fun b -> b.value = bestValue)
@@ -226,7 +226,7 @@ module AI =
         }
     let betProbs (visible:TbVisible) maxCount =
         let n = 100
-        let othersDice = TbVisible.othersDice visible
+        let othersDice = TbVisibleModule.othersDice visible
         let hand = visible.playerHand
         let valueFreqs = Array.zeroCreate 7
         if TbGameSpec.isSeries visible.spec hand then
@@ -282,7 +282,7 @@ module AI =
                     TbAction.raise posB.[bestI]
             )
             updatePlayer = (fun info -> 
-                if info.choppingBlock = -1 then  
+                if info.madeBetSide = -1 then  
                     let maxCount = min (max info.totalDiceLeft 6) 12
                     t <- betProbs info maxCount
             )

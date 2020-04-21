@@ -77,9 +77,9 @@ type TbState =
         totalDiceLeft:int
         spec:TbGameSpec
         currentBet:TbBet
-        choppingBlock:Side
+        madeBetSide:Side
         playersLeft:int
-        currentPlayer:Side
+        nextSide:Side
         playerStates:TbPlayerState[]
         status:TbStatus
         actionHistory: TbActionInstance List
@@ -92,15 +92,16 @@ type TbVisible =
     {
         playerNames:string[]
         spec:TbGameSpec
-        nextPlayer:int
+        nextSide:int
         diceLeft:int[]
         livesLeft:int[]
         playerCount:int
         totalDiceLeft:int
-        choppingBlock:int
+        madeBetSide:Side
         currentBet:TbBet
         playersLeft:int
-        viewingPlayer:int
+        viewingSide:Side
+        legalActions:TbAction[]
         actionHistory: TbActionInstance List
         status:TbStatus
         playerHand:TbHand
@@ -205,8 +206,8 @@ module TbRoundReport =
         let playerDice = playerStates |> Array.map (fun p->p.hand)
         let roundReport = 
              {
-                playerMadeBet=state.choppingBlock
-                playerCalledBet=state.currentPlayer
+                playerMadeBet=state.madeBetSide
+                playerCalledBet=state.nextSide
                 playerLost=loser
                 playerDice=playerDice
                 playerContribution = playerContributions
@@ -321,9 +322,9 @@ module TbTaenkeboksState =
             spec=spec
             totalDiceLeft = spec.playerCount * spec.diceCount
             currentBet = TbBet.startingBet
-            choppingBlock = -1
+            madeBetSide = -1
             playersLeft = spec.playerCount
-            currentPlayer = startingPlayer
+            nextSide = startingPlayer
             playerStates = Array.init spec.playerCount (fun i -> TbPlayerState.initTournament spec)
             status = TbStatus.inPlay
             actionHistory = []
@@ -339,29 +340,3 @@ module TbTaenkeboksState =
     //         else ps            
     //     )
     //     {state with playerStates = playerStates}
-
-module TbVisible =
-    let create (s:TbState) player = 
-        {
-            playerNames = s.playerNames 
-            spec = s.spec
-            nextPlayer = s.currentPlayer
-            diceLeft = s.playerStates |> Array.map(fun p -> p.diceLeft)
-            playerCount = s.playerStates.Length
-            totalDiceLeft = s.totalDiceLeft
-            choppingBlock = s.choppingBlock
-            currentBet = s.currentBet
-            playersLeft = s.playersLeft
-            actionHistory = s.actionHistory
-            livesLeft = s.playerStates |> Array.map(fun p-> p.livesLeft)
-            viewingPlayer = player
-            status = s.status
-            playerMessage = s.playerStates.[player].message
-            playerHand = s.playerStates.[player].hand
-            roundReport = s.roundReport
-            gameReport = s.gameReport
-            tournamentReport = s.tournamentReport
-        }
-    let othersDice(v:TbVisible) = 
-        v.diceLeft |> Array.mapi(fun i x -> (i<> v.viewingPlayer,x)) |> Array.filter fst |> Array.map snd
-

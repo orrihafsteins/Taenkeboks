@@ -85,7 +85,7 @@ namespace PIM.Server.Controllers
         }
 
         [HttpPost("action")]
-        public async void Action(int id, [FromBody]string sAction)
+        public async void Action(string gameName, string id, [FromBody]string sAction)
         {
             string playerName = _signInManager.UserManager.GetUserName(this.User);
             var action = JsonConvert.DeserializeObject<TbAction>(sAction);

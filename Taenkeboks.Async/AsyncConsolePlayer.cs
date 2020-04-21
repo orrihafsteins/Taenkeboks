@@ -20,7 +20,7 @@ namespace Taenkeboks.Async
                 while (v.status.inPlay)
                 {
                     TbConsole.updatePlayer(_p.Name, v);
-                    if(v.nextPlayer == _p.Side) 
+                    if(v.nextSide == _p.Side) 
                     {
                         var a = TbConsole.getPlayerMove(_p.Name, v); // TODO: This blocks, implement as await
                         await _p.PerformAction(a);

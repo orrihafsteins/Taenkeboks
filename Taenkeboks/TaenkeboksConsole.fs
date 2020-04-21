@@ -71,10 +71,10 @@ type StateView = {
 module StateView = 
     let create (info:TbVisible) =
         {
-            nextPlayer = info.playerNames.[info.nextPlayer]
+            nextPlayer = info.playerNames.[info.nextSide]
             players = Array.init info.playerCount (fun i -> {name=info.playerNames.[i];diceLeft=info.diceLeft.[i];livesLeft=info.livesLeft.[i]})
             totalDiceLeft = info.totalDiceLeft
-            choppingBlock = if info.choppingBlock >= 0 then info.playerNames.[info.choppingBlock] else ""
+            choppingBlock = if info.madeBetSide >= 0 then info.playerNames.[info.madeBetSide] else ""
             currentBet = info.currentBet |> TbBet.print
             playerMessage = info.playerMessage
             playerHand = info.playerHand

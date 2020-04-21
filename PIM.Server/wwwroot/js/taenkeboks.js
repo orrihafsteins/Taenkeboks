@@ -1,16 +1,22 @@
-﻿lastRefreshed = -1
-function refreshBoard(gameID) {
-    $.getJSON("/api/taenkeboks/" + gameID,
-        function (b) {
-            currentMove = b.visible.moveHistory.length
+﻿var visible = { "playerNames": ["orrihafsteins@gmail.com", "Bob", "Alice", "Carol"], "spec": { "playerCount": 4, "ofAnyKind": false, "diceCount": 4, "multiSeries": false, "oneIsSeries": true, "extraLives": 1, "lastStanding": true }, "nextSide": 0, "diceLeft": [4, 4, 4, 4], "livesLeft": [2, 2, 2, 2], "playerCount": 4, "totalDiceLeft": 16, "madeBetSide": 3, "currentBet": { "count": 1, "value": 2 }, "playersLeft": 4, "viewingSide": 0, "legalActions": [{ "call": true, "bet": { "count": 0, "value": 6 } }, { "call": false, "bet": { "count": 1, "value": 3 } }, { "call": false, "bet": { "count": 1, "value": 4 } }, { "call": false, "bet": { "count": 1, "value": 5 } }, { "call": false, "bet": { "count": 1, "value": 6 } }, { "call": false, "bet": { "count": 2, "value": 2 } }, { "call": false, "bet": { "count": 2, "value": 3 } }, { "call": false, "bet": { "count": 2, "value": 4 } }, { "call": false, "bet": { "count": 2, "value": 5 } }, { "call": false, "bet": { "count": 2, "value": 6 } }, { "call": false, "bet": { "count": 3, "value": 2 } }, { "call": false, "bet": { "count": 3, "value": 3 } }, { "call": false, "bet": { "count": 3, "value": 4 } }, { "call": false, "bet": { "count": 3, "value": 5 } }, { "call": false, "bet": { "count": 3, "value": 6 } }, { "call": false, "bet": { "count": 4, "value": 2 } }, { "call": false, "bet": { "count": 4, "value": 3 } }, { "call": false, "bet": { "count": 4, "value": 4 } }, { "call": false, "bet": { "count": 4, "value": 5 } }, { "call": false, "bet": { "count": 4, "value": 6 } }, { "call": false, "bet": { "count": 5, "value": 2 } }, { "call": false, "bet": { "count": 5, "value": 3 } }, { "call": false, "bet": { "count": 5, "value": 4 } }, { "call": false, "bet": { "count": 5, "value": 5 } }, { "call": false, "bet": { "count": 5, "value": 6 } }, { "call": false, "bet": { "count": 6, "value": 2 } }, { "call": false, "bet": { "count": 6, "value": 3 } }, { "call": false, "bet": { "count": 6, "value": 4 } }, { "call": false, "bet": { "count": 6, "value": 5 } }, { "call": false, "bet": { "count": 6, "value": 6 } }, { "call": false, "bet": { "count": 7, "value": 2 } }, { "call": false, "bet": { "count": 7, "value": 3 } }, { "call": false, "bet": { "count": 7, "value": 4 } }, { "call": false, "bet": { "count": 7, "value": 5 } }, { "call": false, "bet": { "count": 7, "value": 6 } }, { "call": false, "bet": { "count": 8, "value": 2 } }, { "call": false, "bet": { "count": 8, "value": 3 } }, { "call": false, "bet": { "count": 8, "value": 4 } }, { "call": false, "bet": { "count": 8, "value": 5 } }, { "call": false, "bet": { "count": 8, "value": 6 } }, { "call": false, "bet": { "count": 9, "value": 2 } }, { "call": false, "bet": { "count": 9, "value": 3 } }, { "call": false, "bet": { "count": 9, "value": 4 } }, { "call": false, "bet": { "count": 9, "value": 5 } }, { "call": false, "bet": { "count": 9, "value": 6 } }, { "call": false, "bet": { "count": 10, "value": 2 } }, { "call": false, "bet": { "count": 10, "value": 3 } }, { "call": false, "bet": { "count": 10, "value": 4 } }, { "call": false, "bet": { "count": 10, "value": 5 } }, { "call": false, "bet": { "count": 10, "value": 6 } }, { "call": false, "bet": { "count": 11, "value": 2 } }, { "call": false, "bet": { "count": 11, "value": 3 } }, { "call": false, "bet": { "count": 11, "value": 4 } }, { "call": false, "bet": { "count": 11, "value": 5 } }, { "call": false, "bet": { "count": 11, "value": 6 } }, { "call": false, "bet": { "count": 12, "value": 2 } }, { "call": false, "bet": { "count": 12, "value": 3 } }, { "call": false, "bet": { "count": 12, "value": 4 } }, { "call": false, "bet": { "count": 12, "value": 5 } }, { "call": false, "bet": { "count": 12, "value": 6 } }, { "call": false, "bet": { "count": 13, "value": 2 } }, { "call": false, "bet": { "count": 13, "value": 3 } }, { "call": false, "bet": { "count": 13, "value": 4 } }, { "call": false, "bet": { "count": 13, "value": 5 } }, { "call": false, "bet": { "count": 13, "value": 6 } }, { "call": false, "bet": { "count": 14, "value": 2 } }, { "call": false, "bet": { "count": 14, "value": 3 } }, { "call": false, "bet": { "count": 14, "value": 4 } }, { "call": false, "bet": { "count": 14, "value": 5 } }, { "call": false, "bet": { "count": 14, "value": 6 } }, { "call": false, "bet": { "count": 15, "value": 2 } }, { "call": false, "bet": { "count": 15, "value": 3 } }, { "call": false, "bet": { "count": 15, "value": 4 } }, { "call": false, "bet": { "count": 15, "value": 5 } }, { "call": false, "bet": { "count": 15, "value": 6 } }, { "call": false, "bet": { "count": 16, "value": 2 } }, { "call": false, "bet": { "count": 16, "value": 3 } }, { "call": false, "bet": { "count": 16, "value": 4 } }, { "call": false, "bet": { "count": 16, "value": 5 } }, { "call": false, "bet": { "count": 16, "value": 6 } }, { "call": false, "bet": { "count": 17, "value": 2 } }, { "call": false, "bet": { "count": 17, "value": 3 } }, { "call": false, "bet": { "count": 17, "value": 4 } }, { "call": false, "bet": { "count": 17, "value": 5 } }, { "call": false, "bet": { "count": 17, "value": 6 } }, { "call": false, "bet": { "count": 18, "value": 2 } }, { "call": false, "bet": { "count": 18, "value": 3 } }, { "call": false, "bet": { "count": 18, "value": 4 } }, { "call": false, "bet": { "count": 18, "value": 5 } }, { "call": false, "bet": { "count": 18, "value": 6 } }, { "call": false, "bet": { "count": 19, "value": 2 } }, { "call": false, "bet": { "count": 19, "value": 3 } }, { "call": false, "bet": { "count": 19, "value": 4 } }, { "call": false, "bet": { "count": 19, "value": 5 } }, { "call": false, "bet": { "count": 19, "value": 6 } }, { "call": false, "bet": { "count": 20, "value": 2 } }, { "call": false, "bet": { "count": 20, "value": 3 } }, { "call": false, "bet": { "count": 20, "value": 4 } }, { "call": false, "bet": { "count": 20, "value": 5 } }, { "call": false, "bet": { "count": 20, "value": 6 } }], "actionHistory": [{ "time": "2020-04-21T22:17:48.474174+02:00", "side": 3, "action": { "call": true, "bet": { "count": 1, "value": 2 } } }], "status": { "inPlay": true, "loser": -1, "winner": -1 }, "playerHand": [1, 1, 2, 6], "playerMessage": "Carolraised1d2", "roundReport": { "playerMadeBet": -1, "playerCalledBet": -1, "playerLost": -1, "playerDice": [], "playerContribution": [], "betCalled": { "count": 0, "value": 6 }, "betHighestStanding": { "count": 0, "value": 6 } }, "gameReport": { "playerLost": -1 }, "tournamentReport": { "playerWon": -1, "playerLost": -1 } }
+var gameID = "TestGameID"
+$(document).ready(function () {
+    nextBoard(gameID);
+});
+
+lastRefreshed = -1 //TODO: Get rid of this
+function nextBoard(gameID) {
+    $.getJSON("/game/taenkeboks/play/" + gameID +"/current",
+        function (v) {
+            currentMove = v.actionHistory.length
             if (currentMove > lastRefreshed) {
                 lastRefreshed = currentMove
-                if (!b.status.inPlay) {
-                    render(b, gameID)
-                    renderLifeResult(b.status,b,gameID,null)
+                if (!v.status.inPlay) {
+                    render(v)
+                    //renderLifeResult(b.status, b, gameID, null)
                 }
                 else
-                    render(b, gameID)
+                    render(v)
             }
         })
         .fail(
@@ -19,283 +25,29 @@ function refreshBoard(gameID) {
             });
 }
 
-
-function restartGame(board) {
-    var spec = board.visible.spec
-    var players = board.playerIDs
-    var gameParameters = {
-        "players": players,
-        "specification": {
-            "playerCount": players.length,
-            "ofAnyKind": spec.ofAnyKind,
-            "diceCount": spec.diceCount,
-            "multiSeries": spec.multiSeries,
-            "oneIsSeries": spec.oneIsSeries,
-            "lastStanding": spec.lastStanding,
-            "extraLives": spec.extraLives
-        }
-    }
-    $.ajax({
-        type: 'POST',
-        accepts: 'application/json',
-        url: '/api/gameroom/0',
-        contentType: 'application/json',
-        data: JSON.stringify(gameParameters),
-        error: function (jqXHR, textStatus, errorThrown) {
-            $('#dump').text("cant start game: " + thrownError);
-        },
-        success: function (result) {
-            window.location.href = "/taenkeboks/" + result;
-        }
-    });
-}
-function renderBetResults(s, nextBoard, gameID, continuation) {
-    //render player hands and contributions
-    var report = nextBoard.status.roundReport
-    var hands = report.playerDice
-    var contributions = report.playerContribution
-    var betCalled = report.betCalled
-    var highestStanding = report.betHighestStanding
-    var betValue = betCalled.value
-    for (var side in hands) {
-        var handElement = $('#hand' + side)
-        populateHand(hands[side], handElement)
-        var betElement = $('#bet' + side)
-        var contribution = {
-            "count": contributions[side],
-            "value": betValue
-        }
-        if (contributions[side] > 0) populateBet(contribution, betElement)
-        else betElement.html("&nbsp;")
-    }
-    //render chopping block /player call
-    var choppingBlock = $('#choppingBlock');
-    var callingPlayer = nextBoard.playerNames[report.playerCalledBet]
-    choppingBlock.text(callingPlayer + ' called')
-    //render call 
-    var bettingPlayer = nextBoard.playerNames[report.playerMadeBet]
-    var currentBetElement = $('#currentBet');
-    currentBetElement.html(bettingPlayer + ' bet ' + printBet(betCalled) + ', actually ' + printDiceCount(highestStanding))
-
-    //render result and continue button
-    var losingPlayer = nextBoard.playerNames[report.playerLost]
-    $('#nextPlayerText').text(losingPlayer + ' lost')
-
-    hideMoves();
-    $("#continueButton").show()
-    $("#continueButton").off().click(function () {
-        continuation()
-    });
-}
-
-function renderLifeResult(s, nextBoard, gameID, continuation) {
-    //render player hands and contributions
-    var report = nextBoard.status.gameReport
-    var board = nextBoard
-    var spec = board.visible.spec
-    var playerCount = spec.playerCount
-    for (var side = 0; side < playerCount; side++) {
-        var handElement = $('#hand' + side)
-        populateHand([], handElement)   
-    }
-
-    var choppingBlock = $('#choppingBlock')
-    var currentBetElement = $('#currentBet')
-    var nextPlayerElement = $('#nextPlayerText')
-    if (!report.gameComplete) {
-        //we have another round
-        //render chopping block /player call
-        choppingBlock.text('round complete')
-        //render call 
-        var losingPlayer = board.playerNames[report.playerLostLife]
-        var losingPlayerLives = board.visible.livesLeft[report.playerLostLife] 
-        if(losingPlayerLives === 0)
-            currentBetElement.html(losingPlayer + ' is eliminated')
-        else
-            currentBetElement.html(losingPlayer + ' lost a life, ' + losingPlayerLives + ' remaining')
-
-        //render result
-        var nextPlayer = board.playerNames[board.visible.nextPlayer]
-        nextPlayerElement.text(nextPlayer + ' starts next round')
-        //render continue button
-        hideMoves();
-        $("#continueButton").show()
-        $("#continueButton").off().click(function () {
-            continuation()
-        });
-    }
-    else if (report.gameComplete && report.playerWinner >= 0) {
-        //we have a winner
-        //render chopping block /player call
-        choppingBlock.text('game over')
-        //render call 
-        var winningPlayer = board.playerNames[report.playerWinner]
-        currentBetElement.html(winningPlayer + ' is the winner')
-        //render result 
-
-        nextPlayerElement.text('')
-        //render restart button
-        hideMoves();
-        $("#restartButton").show();
-        $("#restartButton").off().click(function () { restartGame(board) });
-        renderPlayers(board)
-    }
-    else if (report.gameComplete && report.playerLostLife >= 0) {
-        //we have a loser
-        //render chopping block /player call
-        choppingBlock.text('game over')
-        //render call 
-        var losingPlayer = board.playerNames[report.playerLostLife]
-        currentBetElement.html(losingPlayer + ' lost and owes a round')
-        //render result
-        nextPlayerElement.text('')
-        //render restart button
-        hideMoves();
-        $("#restartButton").show();
-        $("#restartButton").off().click(function () { restartGame(board) });
-        renderPlayers(board)
-    }
-}
-
-function consumeEvents(gameID) {
-    $.getJSON("/api/taenkeboks/" + gameID + "/events",
-        function (event) {
-            var roundEnd = event.eventCode == 'PerformedAction' && event.playerAction.call
-            var board = event.board
-            
-            if (!roundEnd) {
-                if (board) {
-                    render(board, gameID)
-                    consumeEvents(gameID)
-                } else
-                    consumeEvents(gameID)
-            }
-            else
-            {
-                var gameReport = event.report.gameReport
-                
-                var renderAndConsume = function () {
-                    render(board, gameID)
-                    consumeEvents(gameID)
-                }
-                var continuation;
-                if (gameReport.playerLostLife >= 0 || gameReport.playerWinner >= 0) {
-                    continuation = function () {
-                        renderLifeResult(event.report, board, gameID, renderAndConsume)
-                    }
-                }
-                else continuation = renderAndConsume;
-                renderBetResults(event.report, board, gameID, continuation)
-            }
-        })
-        .fail(
-        function (jqXHR, textStatus, err) {
-            console.log("Error getting events\ntextStatus: " + textStatus + "\njqXHR: " + jqXHR + "\err: " + err );
-            //$("#dump").text(err)
-            consumeEvents(gameID)
-        });
-}
-
-
-$(document).ready(function () {
-    gameID = parseInt($("#gameID").text())
-    refreshBoard(gameID);
-    consumeEvents(gameID);
-
-});
-
-function die(value) {
-    if (value > 0)
-        return '<img class="die" src="/images/Dice' + value + '.gif"/>'
-    else if (value === 0)
-        return '<img class="die" src="/images/DiceAny.gif" />'
-}
-
-
-function printDiceCount(b) {
-    var valueString = die(b.value)
-    var countString = String(b.count)
-    return countString + " " + valueString
-}
-
-function printBet(b) {
-    if (b.count === 0) return "round start"
-    return printDiceCount(b)
-}
-
-
-function printAction(a) {
-    if (a.call) {
-        return " call"
+function render(v) {
+    $("#dump").empty().append(JSON.stringify(v, undefined, 2))
+    renderPlayers(v)
+    $("#choppingBlock").html(v.totalDiceLeft + " dice in play")
+    $("#currentBet").html(printBet(v.currentBet))
+    $("#nextPlayerText").empty()
+    hideMoves()
+    if (v.nextSide === v.viewingSide) {
+        showMoves(v.legalActions, gameID)
     }
     else {
-        return printBet(a.bet)
+        $("#nextPlayerText").text(playerNames[nextPlayer] + " to move")
     }
 }
 
-function populateHand(hand, handElement) {
-    handElement.empty()
-    for (var di = 0; di < hand.length; di++)
-        handElement.append($(die(hand[di])))
+function hideMoves() {
+    $("#callSpan").hide()
+    $("#raiseSpan").hide()
+    $("#continueButton").hide()
+    $("#restartButton").hide()
 }
 
-function populateBet(bet, betElement) {
-    var betString = printBet(bet)
-    betElement.html(betString)
-}
-
-function renderPlayers(b) {
-    var playerCount = b.visible.playerCount
-    var perspective = b.viewingSide
-    $("#playerRow").empty()
-    for (i = 1; i < playerCount; i++) {
-        var side = (perspective + i) % playerCount
-        $("#playerRow").append(playerCell(b, side))
-    }
-    $("#selfRow").empty().append(playerCell(b, perspective).attr('colspan', playerCount - 1));
-}
-
-function playerCell(b, side) {
-    var diceLeft = b.visible.diceLeft[side]
-    var playerName = b.playerNames[side]
-    var livesLeft = b.visible.livesLeft[side]
-    var lastBet = '&nbsp;'
-    for (var i = 0; i < b.visible.moveHistory.length; i++) {
-        if (b.visible.moveHistory[i].call) break;
-        if (b.visible.hotseatHistory[i + 1] === side) {
-            lastBet = printAction(b.visible.moveHistory[i])
-            break;
-        }
-    }
-    var playerCell = $('<td id=\"' + side + '\" class="player">') 
-    if (livesLeft === 0) {
-        playerCell = $('<td id=\"' + side + '\" class="player deadPlayer">')
-        playerCell.append('<div class="playerName">' + playerName + '</div>')
-    }
-    else if (livesLeft === 1)
-        playerCell.append('<div class="playerName">' + playerName + '</div>')
-    else
-        playerCell.append('<span class="playerName">' + playerName + '<span class="playerLives">&nbsp;x' + livesLeft +'</span></span>')
-
-    playerCell.append('<div id=\"bet' + side + '\" class="playerBet">' + lastBet + '<div>')
-    //var diceTable = $('<table class="dieTable"></table>')
-    var hand;
-    //diceRow.appendTo(diceTable)
-
-    var handElement = $('<div id=\"hand' + side + '\">')
-    if (side === b.viewingSide) {
-        hand = b.hidden.hand
-    }
-    else {
-        hand = Array.apply(null, Array(diceLeft)).map(Number.prototype.valueOf, 0);
-    }
-    populateHand(hand,handElement)
-    playerCell.append(handElement)
-    if (b.visible.nextPlayer === side)
-        playerCell.addClass('active')
-    return playerCell
-}
-function showMoves(legalMoves, gameID) {
+function showMoves(legalMoves) {
     //call button
     if (legalMoves[0].call) {
         $("#callSpan").show()
@@ -305,7 +57,7 @@ function showMoves(legalMoves, gameID) {
             $.ajax({
                 type: 'POST',
                 accepts: 'application/json',
-                url: '/api/taenkeboks/' + gameID,
+                url: "/game/taenkeboks/play/" + gameID +"/action",
                 contentType: 'application/json',
                 data: JSON.stringify(legalMoves[0]),
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -335,7 +87,7 @@ function showMoves(legalMoves, gameID) {
 
     //values
     var valueDropdown = $("#raiseValues")
-    var setValues = function (count,selected) {
+    var setValues = function (count, selected) {
         var lastValue = valueDropdown.val()
         valueDropdown.empty()
         values = fValues(count)
@@ -343,8 +95,8 @@ function showMoves(legalMoves, gameID) {
             $('<option />', { value: values[val], text: values[val] }).appendTo(valueDropdown);
         }
         if (lastValue)
-        if(values.includes(parseInt(lastValue)))
-            valueDropdown.val(lastValue)
+            if (values.includes(parseInt(lastValue)))
+                valueDropdown.val(lastValue)
     }
     setValues(nextRaise.bet.count)
     countDropdown.off().change(function () {
@@ -365,7 +117,7 @@ function showMoves(legalMoves, gameID) {
         $.ajax({
             type: 'POST',
             accepts: 'application/json',
-            url: '/api/taenkeboks/' + gameID,
+            url: "/game/taenkeboks/play/" + gameID + "/action",
             contentType: 'application/json',
             data: JSON.stringify(bet),
             error: function (jqXHR, textStatus, errorThrown) {
@@ -378,47 +130,85 @@ function showMoves(legalMoves, gameID) {
     });
 }
 
-
-function hideMoves() {
-    $("#callSpan").hide()
-    $("#raiseSpan").hide()
-    $("#continueButton").hide()
-    $("#restartButton").hide()
+function printBet(b) {
+    if (b.count === 0) return "round start"
+    return printDiceCount(b)
 }
-function render(b, gameID) {
-    //$("#dump").empty().append(JSON.stringify(b, undefined, 2))
-    var perspective = b.viewingSide
-    var visible = b.visible
-    var hidden = b.hidden
-    var playerCount = visible.playerCount
-    var nextPlayer = visible.nextPlayer
-    var choppingBlock = visible.choppingBlock
-    var playerNames = b.playerNames
-    var nextPlayerName = playerNames[visible.nextPlayer]
 
-    renderPlayers(b)
-    //render players
-    
-    
-    //action: chopping block
-    //if(b.visible.choppingBlock < 0)
-    //    $("#choppingBlock").html("&nbsp;")
-    //else
-    //    $("#choppingBlock").text(playerNames[choppingBlock] + " bet")
-    $("#choppingBlock").html(visible.totalDiceLeft+ " dice in play")
+function printDiceCount(b) {
+    var valueString = die(b.value)
+    var countString = String(b.count)
+    return countString + " " + valueString
+}
 
-    //result: current bet
-    $("#currentBet").html(printBet(visible.currentBet))
+function die(value) {
+    if (value > 0)
+        return '<img class="die" src="/images/Dice' + value + '.gif"/>'
+    else if (value === 0)
+        return '<img class="die" src="/images/DiceAny.gif" />'
+}
 
-    //reaction: next player / player prompt
-    $("#nextPlayerText").empty()
-    hideMoves()
-    if (nextPlayer === perspective) {
-        showMoves(b.legalMoves, gameID)
+function renderPlayers(v) {
+    $("#playerRow").empty()
+    for (i = 1; i < v.playerCount; i++) {
+        var side = (v.viewingSide + i) % v.playerCount
+        $("#playerRow").append(renderPlayerCell(v, side))
+    }
+    $("#selfRow").empty().append(renderPlayerCell(v, v.viewingSide).attr('colspan', v.playerCount - 1));
+}
+
+function renderPlayerCell(v, side) {
+    var diceLeft = v.diceLeft[side]
+    var playerName = v.playerNames[side]
+    var livesLeft = v.livesLeft[side]
+    var lastBet = '&nbsp;'
+    for (var i = 0; i < v.actionHistory.length; i++) {
+        if (v.actionHistory[i].action.call) break;
+        if (v.actionHistory[i + 1].side === side) {
+            lastBet = printAction(v.actionHistory[i].action)
+            break;
+        }
+    }
+    var playerCell = $('<td id=\"' + side + '\" class="player">')
+    if (livesLeft === 0) {
+        playerCell = $('<td id=\"' + side + '\" class="player deadPlayer">')
+        playerCell.append('<div class="playerName">' + playerName + '</div>')
+    }
+    else if (livesLeft === 1)
+        playerCell.append('<div class="playerName">' + playerName + '</div>')
+    else
+        playerCell.append('<span class="playerName">' + playerName + '<span class="playerLives">&nbsp;x' + livesLeft + '</span></span>')
+
+    playerCell.append('<div id=\"bet' + side + '\" class="playerBet">' + lastBet + '<div>')
+    //var diceTable = $('<table class="dieTable"></table>')
+    var hand;
+    //diceRow.appendTo(diceTable)
+
+    var handElement = $('<div id=\"hand' + side + '\">')
+    if (side === v.viewingSide) {
+        hand = v.playerHand
     }
     else {
-        $("#nextPlayerText").text(playerNames[nextPlayer] + " to move")
+        hand = Array.apply(null, Array(diceLeft)).map(Number.prototype.valueOf, 0);
     }
+    populateHand(hand, handElement)
+    playerCell.append(handElement)
+    if (v.nextPlayer === side)
+        playerCell.addClass('active')
+    return playerCell
 }
 
+function populateHand(hand, handElement) {
+    handElement.empty()
+    for (var di = 0; di < hand.length; di++)
+        handElement.append($(die(hand[di])))
+}
 
+function printAction(a) {
+    if (a.call) {
+        return " call"
+    }
+    else {
+        return printBet(a.bet)
+    }
+}
