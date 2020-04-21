@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Taenkeboks;
 
-namespace Taenkeboks.AsyncConsole
+namespace Taenkeboks.Async
 {
     class AsyncConsolePlayer
     {
@@ -13,20 +13,33 @@ namespace Taenkeboks.AsyncConsole
         {
             _p = p;
         }
-
-
         public async Task RunPlayer()
         {
-            var v = await _p.Next();
-            while (v.status.inPlay)
-            {
-                TbConsole.updatePlayer(_p.Name, v);
-                if(v.nextPlayer == _p.Side) 
+            try { 
+                var v = await _p.Next();
+                while (v.status.inPlay)
                 {
-                    var a = TbConsole.getPlayerMove(_p.Name, v); // TODO: This blocks, implement as await
-                    await _p.PerformAction(a);
+                    TbConsole.updatePlayer(_p.Name, v);
+                    if(v.nextPlayer == _p.Side) 
+                    {
+                        var a = TbConsole.getPlayerMove(_p.Name, v); // TODO: This blocks, implement as await
+                        await _p.PerformAction(a);
+                    }
+                    v = await _p.Next();
                 }
-                v = await _p.Next();
+                TbConsole.updatePlayer(_p.Name, v);
+            }
+            catch (System.Threading.Channels.ChannelClosedException e)
+            {
+                await Console.Out.WriteLineAsync($"{_p.Name} channel closed");
+            }
+            catch (System.OperationCanceledException e)
+            {
+                await Console.Out.WriteLineAsync($"{_p.Name} channel cancelled");
+            }
+            catch (System.Exception e)
+            {
+                await Console.Out.WriteLineAsync($"{_p.Name} channel exception");
             }
         }
     }

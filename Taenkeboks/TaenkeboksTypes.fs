@@ -111,7 +111,17 @@ type TbVisible =
     }
 
 module TbGameSpec =
-    let initClassicRules playerCount =
+    let initClassicQuick playerCount =
+        {
+            playerCount = playerCount
+            ofAnyKind=false
+            diceCount=4
+            multiSeries=false
+            oneIsSeries=true
+            extraLives = 0
+            lastStanding = false
+        }
+    let initClassicTournament playerCount =
         {
             playerCount = playerCount
             ofAnyKind=false
@@ -121,7 +131,7 @@ module TbGameSpec =
             extraLives = 1
             lastStanding = true
         }
-    let initTestRules playerCount= 
+    let initTest playerCount= 
         {
             playerCount = playerCount
             ofAnyKind = false
@@ -131,7 +141,7 @@ module TbGameSpec =
             extraLives = 0
             lastStanding = true
         }   
-    let initGoldenLionRules playerCount= 
+    let initGoldenLion playerCount= 
         {
             playerCount=playerCount
             ofAnyKind=true

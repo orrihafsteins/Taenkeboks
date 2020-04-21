@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
-namespace Taenkeboks.AsyncConsole
+namespace Taenkeboks.Async
 {
     enum PlayerType { Cpu,Console}
     class PlayerSpec
@@ -23,20 +23,22 @@ namespace Taenkeboks.AsyncConsole
                 new PlayerSpec{Name="Alice", Type=PlayerType.Cpu},
                 new PlayerSpec{Name="Orri", Type=PlayerType.Console}
             };
-
             var playerNames = players.Select(p => p.Name).ToArray();
-            var spec = TbGameSpecModule.initClassicRules(players.Length);
+            var spec = TbGameSpecModule.initClassicQuick(players.Length);
             var game = TbGameModule.create(spec);
-            var asyncGame = new AsyncGame<TbState, TbAction, TbVisible>(game, playerNames);
-            Task[] playerTask = players.Select((p,i) => {
+            var cts = new CancellationTokenSource();
+            var asyncGame = new AsyncGame<TbState, TbAction, TbVisible>(game, playerNames, cts.Token);
+            Task[] playerTasks = players.Select((p,i) => {
                 return p.Type switch
                 {
-                    PlayerType.Cpu => new AsyncCpuPlayer(asyncGame.Players[i], spec).RunPlayer(),
+                    PlayerType.Cpu => new AsyncCpuPlayer(asyncGame.Players[i], spec).Start(),
                     PlayerType.Console => new AsyncConsolePlayer(asyncGame.Players[i]).RunPlayer(),
                     _ => throw new Exception("Death"),
                 };
             }).ToArray();
-            await asyncGame.RunGame();
+            await asyncGame.Start();
+            Task.WaitAll(playerTasks);
+            await Console.In.ReadLineAsync();
         }
     }
 }

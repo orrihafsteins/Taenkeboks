@@ -92,6 +92,9 @@ module TbConsole =
                 Result.Ok (TbAction.raise {count = count;value = value})
             with 
             | e -> Error e
+    let promptPlayer name v = 
+        printfn "----------------------------- GET MOVE -------------------------------"
+        v |> StateView.create |> Json.serializeIndented |> printfn "%s" 
     let getPlayerMove name v = 
         let rec getMove () =
             printf "Enter move %s: " name
@@ -102,8 +105,7 @@ module TbConsole =
                 getMove ()  
             |  Result.Ok move ->
                 move
-        printfn "----------------------------- GET MOVE -------------------------------"
-        v |> StateView.create |> Json.serializeIndented |> printfn "%s" 
+        promptPlayer name v
         getMove ()
     let updatePlayer name v =
         printfn "----------------------------- UPDATE ---------------------------------"

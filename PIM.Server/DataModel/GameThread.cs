@@ -8,38 +8,15 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Taenkeboks;
+using Taenkeboks.Async;
 
 namespace PIM.Server.DataModel
 {
-
-    public static class FSharpUtil
-    {
-        public static Func<T, Unit> ToFunc<T>(this Action<T> action)
-        {
-            return x => { action(x); return (Unit)Activator.CreateInstance(typeof(Unit), true); };
-        }
-
-        public static FSharpFunc<I, Unit> ToFSharp<I>(this Action<I> a)
-        {
-            var unit = (Unit)Activator.CreateInstance(typeof(Unit), true);
-            var funcA = a.ToFunc();
-            return FSharpFunc<I, Unit>.FromConverter(new Converter<I, Unit>(funcA));
-        }
-
-        public static FSharpFunc<I, O> ToFsharp<I, O>(this Func<I, O> a)
-        {
-            return FSharpFunc<I, O>.FromConverter(new Converter<I, O>(a));
-        }
-
-
-    }
-
     public enum PlayerType
     {
         Async,
         Cpu
     }
-
     public class PlayerSpec
     {
         public PlayerType PlayerType { get; set; }
@@ -48,19 +25,12 @@ namespace PIM.Server.DataModel
 
     public class GameThread
     {
-        
-        Thread _thread;
-        Game<TbState, TbAction, TbVisible> _game;
-        private Channel<(int, TbAction)> _actionQueue; //Game controller adds actions to this queue on behalf of players, game thread processes
-        private Channel<TbVisible>[] _visibleQueues; //Game thread adds visible information to these queues, picked up and delivered to players by GameControllar
-        private TbVisible[] _visibleCurrent; //Contains last return visible information for each player
-        private string[] _playerNames;
-        private Player<TbVisible,TbAction>[] _players;
-
+        PlayerSpec[] _playerSpecs;
+        string[] _playerNames;
+        TbGameSpec _spec;
+        AsyncGame<TbState, TbAction, TbVisible> _game;
         public static GameThread Example()
         {
-            int playerCount = 4;
-            var spec = TbGameSpecModule.initClassicRules(playerCount);
             PlayerSpec[] players = new PlayerSpec[]
             {
                 new PlayerSpec { PlayerType = PlayerType.Async, PlayerName = "orrihafsteins@gmail.com" },
@@ -68,6 +38,7 @@ namespace PIM.Server.DataModel
                 new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Alice" },
                 new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Carol" }
             };
+            var spec = TbGameSpecModule.initClassicRules(players.Length);
             return new GameThread(spec, players);
         }
 
@@ -75,92 +46,25 @@ namespace PIM.Server.DataModel
         public GameThread(TbGameSpec spec, PlayerSpec[] playerSpecs)
         {
             if (spec.playerCount != playerSpecs.Length) throw new Exception("Death");
-            _actionQueue = Channel.CreateUnbounded<(int, TbAction)>();
-            _visibleQueues = playerSpecs.Select(n => Channel.CreateUnbounded<TbVisible>()).ToArray();
-            _visibleCurrent = playerSpecs.Select(n => (TbVisible)null).ToArray();
+            _playerSpecs = playerSpecs;
+            _spec = spec;
             _playerNames = playerSpecs.Select(ps => ps.PlayerName).ToArray();
-            var players = playerSpecs.Select( (ps,i) =>
-            {
-                switch (ps.PlayerType)
-                {
-                    case PlayerType.Async:
-                        return CreateAsyncPlayer(i, ps.PlayerName);
-                    case PlayerType.Cpu:
-                        return TbAiPlayerModule.createPlayer(spec, ps.PlayerName);
-                    default:
-                        throw new Exception("Death");
-                }
-            }).ToArray();
-            _game = TbGameModule.create(spec);
-            _players = players;
         }
 
-        private void GameLoop()
+        public async Task Start()
         {
-            Game.play<TbState, TbAction, TbVisible>(_game,_players);
-        }
-
-        public void StartGame()
-        {
-            if (_thread != null) throw new Exception("already started");
-            _thread = new Thread(new System.Threading.ThreadStart(GameLoop));
-            _thread.Start();
-        }
-        //public void StopGame()
-        //{
-        //    _thread.Abort();
-        //}
-
-        private int PlayerIndex(string playerName)
-        {
-            int side = System.Array.IndexOf(_playerNames, playerName);
-            if (side < 0) throw new Exception("Death");
-            return side;
-        }
-
-        public async Task AddPlayerAction(string playerName, TbAction action)
-        {
-            int pIndex = PlayerIndex(playerName);
-            await _actionQueue.Writer.WriteAsync((pIndex, action));
-        }
-
-        public TbVisible GetPlayerVisible(string playerName)//Immediately returns with the next or current state
-        {
-            int pIndex = PlayerIndex(playerName);
-            if (_visibleQueues[pIndex].Reader.TryRead(out TbVisible next))
-            {
-                return next;
-            }
-            else
-                return _visibleCurrent[pIndex];
-        }
-
-        public async Task<TbVisible> GetNextPlayerVisible(string playerName)//awaits until a new visible state for player is available
-        {
-            int pIndex = PlayerIndex(playerName);
-            return await _visibleQueues[pIndex].Reader.ReadAsync();
-        }
-
-        private Player<TbVisible, TbAction> CreateAsyncPlayer(int pIndex,string playerName)
-        {
-            Unit unit = (Unit)Activator.CreateInstance(typeof(Unit), true);
-            Func<TbVisible, TbAction> policy = (v) =>
-            {
-                //TODO: make player interface async
-                (int aSide, TbAction a) = _actionQueue.Reader.ReadAsync().AsTask().Result; // These should block the game thread by design
-                while (pIndex != aSide) (aSide, a) = _actionQueue.Reader.ReadAsync().AsTask().Result; //Silently ignore actions from other players?!
-                return a;
-            };
-            Func<TbVisible, Unit> update = (v) =>
-            {
-                _visibleQueues[pIndex].Writer.WriteAsync(v).AsTask().Wait();
-                return unit;
-            };
-            return new Player<TbVisible, TbAction>(
-                playerName,
-                policy.ToFsharp(),
-                update.ToFsharp()
-            );
+            var playerNames = _playerSpecs.Select(p => p.PlayerName).ToArray();
+            var game = TbGameModule.create(_spec);
+            _game = new AsyncGame<TbState, TbAction, TbVisible>(game, playerNames);
+            Task[] cpuPlayerTasks =
+                _playerSpecs.Select((p, i) => {
+                    if (p.PlayerType == PlayerType.Cpu)
+                        return new AsyncCpuPlayer(_game.Players[i], _spec).Start();
+                    else
+                        return null;
+            }).Where(p=>p != null).ToArray();
+            await _game.Start();
+            Task.WaitAll(cpuPlayerTasks);
         }
     }
 }

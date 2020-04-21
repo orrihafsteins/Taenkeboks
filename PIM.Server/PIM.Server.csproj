@@ -42,6 +42,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PIM\PIM.fsproj" />
+    <ProjectReference Include="..\Taenkeboks.Async\Taenkeboks.Async.csproj" />
     <ProjectReference Include="..\Taenkeboks\Taenkeboks.fsproj" />
   </ItemGroup>
 

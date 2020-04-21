@@ -9,7 +9,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PIM", "PIM\PIM.fsproj", "{6
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Taenkeboks.Test", "Taenkeboks.Test\Taenkeboks.Test.fsproj", "{17324E73-E80A-4E24-ABD9-46A6283296F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PIM.Server", "PIM.Server\PIM.Server.csproj", "{5DC14811-2991-4FEE-BAE8-3C9B0A282205}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PIM.Server", "PIM.Server\PIM.Server.csproj", "{5DC14811-2991-4FEE-BAE8-3C9B0A282205}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taenkeboks.Async", "Taenkeboks.Async\Taenkeboks.Async.csproj", "{9A31980B-EE20-42AE-BEB6-F1B7C58C160D}"
 EndProject
