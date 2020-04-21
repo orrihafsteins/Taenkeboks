@@ -26,8 +26,7 @@ namespace Taenkeboks.Async
             var playerNames = players.Select(p => p.Name).ToArray();
             var spec = TbGameSpecModule.initClassicQuick(players.Length);
             var game = TbGameModule.create(spec);
-            var cts = new CancellationTokenSource();
-            var asyncGame = new AsyncGame<TbState, TbAction, TbVisible>(game, playerNames, cts.Token);
+            var asyncGame = new AsyncGame<TbState, TbAction, TbVisible>(game, playerNames);
             Task[] playerTasks = players.Select((p,i) => {
                 return p.Type switch
                 {

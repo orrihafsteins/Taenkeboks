@@ -29,15 +29,15 @@ namespace Taenkeboks.Async
                 }
                 TbConsole.updatePlayer(_p.Name, v);
             }
-            catch (System.Threading.Channels.ChannelClosedException e)
+            catch (System.Threading.Channels.ChannelClosedException)
             {
                 await Console.Out.WriteLineAsync($"{_p.Name} channel closed");
             }
-            catch (System.OperationCanceledException e)
+            catch (System.OperationCanceledException)
             {
                 await Console.Out.WriteLineAsync($"{_p.Name} channel cancelled");
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
                 await Console.Out.WriteLineAsync($"{_p.Name} channel exception");
             }

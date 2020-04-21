@@ -32,15 +32,15 @@ namespace Taenkeboks.Async
                     v = await _p.Next();
                 }
             }
-            catch (System.Threading.Channels.ChannelClosedException e)
+            catch (System.Threading.Channels.ChannelClosedException)
             {
                 await Console.Out.WriteLineAsync($"{_p.Name} channel closed");
             }
-            catch (System.OperationCanceledException e)
+            catch (System.OperationCanceledException)
             {
                 await Console.Out.WriteLineAsync($"{_p.Name} channel cancelled");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 await Console.Out.WriteLineAsync($"{_p.Name} channel exception");
             }

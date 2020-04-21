@@ -17,19 +17,21 @@ namespace PIM.Server.DataModel
         Async,
         Cpu
     }
+
     public class PlayerSpec
     {
         public PlayerType PlayerType { get; set; }
         public string PlayerName { get; set; }
     }
 
-    public class GameThread
+    public class GameTask
     {
         PlayerSpec[] _playerSpecs;
         string[] _playerNames;
         TbGameSpec _spec;
         AsyncGame<TbState, TbAction, TbVisible> _game;
-        public static GameThread Example()
+        public string ID { get; } = Guid.NewGuid().ToString();
+        public static GameTask Example()
         {
             PlayerSpec[] players = new PlayerSpec[]
             {
@@ -38,17 +40,37 @@ namespace PIM.Server.DataModel
                 new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Alice" },
                 new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Carol" }
             };
-            var spec = TbGameSpecModule.initClassicRules(players.Length);
-            return new GameThread(spec, players);
+            var spec = TbGameSpecModule.initClassicTournament(players.Length);
+            return new GameTask(spec, players);
         }
 
-        //public GameThread(Game<TbState, TbAction, TbVisible> game, Player<TbVisible, TbAction>[] players)
-        public GameThread(TbGameSpec spec, PlayerSpec[] playerSpecs)
+        public GameTask(TbGameSpec spec, PlayerSpec[] playerSpecs)
         {
-            if (spec.playerCount != playerSpecs.Length) throw new Exception("Death");
+            if (spec.playerCount != playerSpecs.Length) throw new Exception("Inconsistent player count");
             _playerSpecs = playerSpecs;
             _spec = spec;
             _playerNames = playerSpecs.Select(ps => ps.PlayerName).ToArray();
+        }
+
+
+
+        public TbVisible GetCurrent(string playerName)
+        {
+            var player = _game.Players.First(p => p.Name == playerName);//TODO: Throw custom exception instead of InvalidOperationException
+            return player.Current();
+        }
+
+        public async Task<TbVisible> GetNext(string playerName)
+        {
+            var player = _game.Players.First(p => p.Name == playerName);//TODO: Throw custom exception instead of InvalidOperationException
+            return await player.Next();
+
+
+        }
+        public async Task PerformAction(string playerName,TbAction action)
+        {
+            var player = _game.Players.First(p => p.Name == playerName);//TODO: Throw custom exception instead of InvalidOperationException
+            await player.PerformAction(action);
         }
 
         public async Task Start()
@@ -65,6 +87,11 @@ namespace PIM.Server.DataModel
             }).Where(p=>p != null).ToArray();
             await _game.Start();
             Task.WaitAll(cpuPlayerTasks);
+        }
+
+        public void Stop()
+        {
+            _game.Stop();// this kills game and player tasks
         }
     }
 }

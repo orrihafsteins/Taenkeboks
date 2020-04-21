@@ -13,15 +13,15 @@ namespace Taenkeboks.Async
         Game<S, A, V> _game;
         string[] _playerNames;
         Channel<(int, A)> _action;
-        CancellationToken _ct;
+        CancellationTokenSource _cts;
         public AsyncPlayer<V,A>[] Players { get; private set; }
-        public AsyncGame(Game<S, A, V> game,string[] playerNames, CancellationToken ct)
+        public AsyncGame(Game<S, A, V> game,string[] playerNames)
         {
-            _ct = ct;
+            _cts = new CancellationTokenSource();
             _game = game;
             _playerNames = playerNames;
             _action = Channel.CreateUnbounded<(int,A)> ();
-            Players =playerNames.Select((n, i) => new AsyncPlayer<V,A>(n, i, _action.Writer,ct)).ToArray();
+            Players =playerNames.Select((n, i) => new AsyncPlayer<V,A>(n, i, _action.Writer, _cts.Token)).ToArray();
         }
 
         public async Task UpdatePlayer(AsyncPlayer<V, A> player, S state)
@@ -49,7 +49,7 @@ namespace Taenkeboks.Async
             {
                 while (!_game.gameOver.Invoke(state))
                 {
-                    var (side, action) = await _action.Reader.ReadAsync(_ct);
+                    var (side, action) = await _action.Reader.ReadAsync(_cts.Token);
                     var ar = _game.advance.Invoke(state).Invoke(side).Invoke(action);
                     if (ar.TryOk(ref state))
                         await UpdatePlayers(state);
@@ -62,18 +62,23 @@ namespace Taenkeboks.Async
                 foreach (var p in Players)
                     p.End();
             }
-            catch (System.Threading.Channels.ChannelClosedException e)
+            catch (System.Threading.Channels.ChannelClosedException)
             {
                 await Console.Out.WriteLineAsync($"Game channel closed");
             }
-            catch (System.OperationCanceledException e)
+            catch (System.OperationCanceledException)
             {
                 await Console.Out.WriteLineAsync($"Game channel cancelled");
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 await Console.Out.WriteLineAsync($"Game channel exception");
             }
+        }
+
+        public void Stop()
+        {
+            _cts.Cancel();// this should kill game and player tasks by System.OperationCanceledException
         }
     }
 }
