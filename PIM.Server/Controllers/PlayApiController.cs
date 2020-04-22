@@ -16,8 +16,6 @@ using Taenkeboks;
 
 namespace PIM.Server.Controllers
 {
-    
-
     public class GameManager
     {
         public static GameManager Instance { get; } = new GameManager();
@@ -85,11 +83,13 @@ namespace PIM.Server.Controllers
         }
 
         [HttpPost("action")]
-        public async void Action(string gameName, string id, [FromBody]string sAction)
+        public async Task<IActionResult> Action(string gameName, string id, [FromBody]object oAction)
         {
             string playerName = _signInManager.UserManager.GetUserName(this.User);
+            var sAction = oAction.ToString();
             var action = JsonConvert.DeserializeObject<TbAction>(sAction);
             await _gameThread.PerformAction(playerName,action);
+            return Ok();
         }
     }
 }

@@ -41,6 +41,7 @@ namespace PIM.Server.DataModel
                 new PlayerSpec { PlayerType = PlayerType.Cpu, PlayerName = "Carol" }
             };
             var spec = TbGameSpecModule.initClassicTournament(players.Length);
+
             return new GameTask(spec, players);
         }
 

@@ -6,11 +6,11 @@ function refreshBoard(gameID) {
             if (currentMove > lastRefreshed) {
                 lastRefreshed = currentMove
                 if (!b.status.inPlay) {
-                    render(b, gameID)
+                    renderBet(b, gameID)
                     renderLifeResult(b.status,b,gameID,null)
                 }
                 else
-                    render(b, gameID)
+                    renderBet(b, gameID)
             }
         })
         .fail(
@@ -165,7 +165,7 @@ function consumeEvents(gameID) {
             
             if (!roundEnd) {
                 if (board) {
-                    render(board, gameID)
+                    renderBet(board, gameID)
                     consumeEvents(gameID)
                 } else
                     consumeEvents(gameID)
@@ -175,7 +175,7 @@ function consumeEvents(gameID) {
                 var gameReport = event.report.gameReport
                 
                 var renderAndConsume = function () {
-                    render(board, gameID)
+                    renderBet(board, gameID)
                     consumeEvents(gameID)
                 }
                 var continuation;
@@ -385,7 +385,7 @@ function hideMoves() {
     $("#continueButton").hide()
     $("#restartButton").hide()
 }
-function render(b, gameID) {
+function renderBet(b, gameID) {
     //$("#dump").empty().append(JSON.stringify(b, undefined, 2))
     var perspective = b.viewingSide
     var visible = b.visible

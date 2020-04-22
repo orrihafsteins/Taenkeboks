@@ -132,6 +132,16 @@ module TbGameSpec =
             extraLives = 1
             lastStanding = true
         }
+    let initClassicInstant playerCount =
+        {
+            playerCount = playerCount
+            ofAnyKind=false
+            diceCount=1
+            multiSeries=false
+            oneIsSeries=true
+            extraLives = 0
+            lastStanding = false
+        }
     let initTest playerCount= 
         {
             playerCount = playerCount

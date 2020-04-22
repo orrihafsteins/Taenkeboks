@@ -45,11 +45,7 @@ html, body {
 }
 
 .deadPlayer {
-    text-decoration: line-through;
     background-color: #D00000;
-}
-.deadPlayer {
-    text-decoration: line-through;
 }
 
 .playerLives {

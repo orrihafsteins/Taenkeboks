@@ -1,32 +1,50 @@
-﻿var visible = { "playerNames": ["orrihafsteins@gmail.com", "Bob", "Alice", "Carol"], "spec": { "playerCount": 4, "ofAnyKind": false, "diceCount": 4, "multiSeries": false, "oneIsSeries": true, "extraLives": 1, "lastStanding": true }, "nextSide": 0, "diceLeft": [4, 4, 4, 4], "livesLeft": [2, 2, 2, 2], "playerCount": 4, "totalDiceLeft": 16, "madeBetSide": 3, "currentBet": { "count": 1, "value": 2 }, "playersLeft": 4, "viewingSide": 0, "legalActions": [{ "call": true, "bet": { "count": 0, "value": 6 } }, { "call": false, "bet": { "count": 1, "value": 3 } }, { "call": false, "bet": { "count": 1, "value": 4 } }, { "call": false, "bet": { "count": 1, "value": 5 } }, { "call": false, "bet": { "count": 1, "value": 6 } }, { "call": false, "bet": { "count": 2, "value": 2 } }, { "call": false, "bet": { "count": 2, "value": 3 } }, { "call": false, "bet": { "count": 2, "value": 4 } }, { "call": false, "bet": { "count": 2, "value": 5 } }, { "call": false, "bet": { "count": 2, "value": 6 } }, { "call": false, "bet": { "count": 3, "value": 2 } }, { "call": false, "bet": { "count": 3, "value": 3 } }, { "call": false, "bet": { "count": 3, "value": 4 } }, { "call": false, "bet": { "count": 3, "value": 5 } }, { "call": false, "bet": { "count": 3, "value": 6 } }, { "call": false, "bet": { "count": 4, "value": 2 } }, { "call": false, "bet": { "count": 4, "value": 3 } }, { "call": false, "bet": { "count": 4, "value": 4 } }, { "call": false, "bet": { "count": 4, "value": 5 } }, { "call": false, "bet": { "count": 4, "value": 6 } }, { "call": false, "bet": { "count": 5, "value": 2 } }, { "call": false, "bet": { "count": 5, "value": 3 } }, { "call": false, "bet": { "count": 5, "value": 4 } }, { "call": false, "bet": { "count": 5, "value": 5 } }, { "call": false, "bet": { "count": 5, "value": 6 } }, { "call": false, "bet": { "count": 6, "value": 2 } }, { "call": false, "bet": { "count": 6, "value": 3 } }, { "call": false, "bet": { "count": 6, "value": 4 } }, { "call": false, "bet": { "count": 6, "value": 5 } }, { "call": false, "bet": { "count": 6, "value": 6 } }, { "call": false, "bet": { "count": 7, "value": 2 } }, { "call": false, "bet": { "count": 7, "value": 3 } }, { "call": false, "bet": { "count": 7, "value": 4 } }, { "call": false, "bet": { "count": 7, "value": 5 } }, { "call": false, "bet": { "count": 7, "value": 6 } }, { "call": false, "bet": { "count": 8, "value": 2 } }, { "call": false, "bet": { "count": 8, "value": 3 } }, { "call": false, "bet": { "count": 8, "value": 4 } }, { "call": false, "bet": { "count": 8, "value": 5 } }, { "call": false, "bet": { "count": 8, "value": 6 } }, { "call": false, "bet": { "count": 9, "value": 2 } }, { "call": false, "bet": { "count": 9, "value": 3 } }, { "call": false, "bet": { "count": 9, "value": 4 } }, { "call": false, "bet": { "count": 9, "value": 5 } }, { "call": false, "bet": { "count": 9, "value": 6 } }, { "call": false, "bet": { "count": 10, "value": 2 } }, { "call": false, "bet": { "count": 10, "value": 3 } }, { "call": false, "bet": { "count": 10, "value": 4 } }, { "call": false, "bet": { "count": 10, "value": 5 } }, { "call": false, "bet": { "count": 10, "value": 6 } }, { "call": false, "bet": { "count": 11, "value": 2 } }, { "call": false, "bet": { "count": 11, "value": 3 } }, { "call": false, "bet": { "count": 11, "value": 4 } }, { "call": false, "bet": { "count": 11, "value": 5 } }, { "call": false, "bet": { "count": 11, "value": 6 } }, { "call": false, "bet": { "count": 12, "value": 2 } }, { "call": false, "bet": { "count": 12, "value": 3 } }, { "call": false, "bet": { "count": 12, "value": 4 } }, { "call": false, "bet": { "count": 12, "value": 5 } }, { "call": false, "bet": { "count": 12, "value": 6 } }, { "call": false, "bet": { "count": 13, "value": 2 } }, { "call": false, "bet": { "count": 13, "value": 3 } }, { "call": false, "bet": { "count": 13, "value": 4 } }, { "call": false, "bet": { "count": 13, "value": 5 } }, { "call": false, "bet": { "count": 13, "value": 6 } }, { "call": false, "bet": { "count": 14, "value": 2 } }, { "call": false, "bet": { "count": 14, "value": 3 } }, { "call": false, "bet": { "count": 14, "value": 4 } }, { "call": false, "bet": { "count": 14, "value": 5 } }, { "call": false, "bet": { "count": 14, "value": 6 } }, { "call": false, "bet": { "count": 15, "value": 2 } }, { "call": false, "bet": { "count": 15, "value": 3 } }, { "call": false, "bet": { "count": 15, "value": 4 } }, { "call": false, "bet": { "count": 15, "value": 5 } }, { "call": false, "bet": { "count": 15, "value": 6 } }, { "call": false, "bet": { "count": 16, "value": 2 } }, { "call": false, "bet": { "count": 16, "value": 3 } }, { "call": false, "bet": { "count": 16, "value": 4 } }, { "call": false, "bet": { "count": 16, "value": 5 } }, { "call": false, "bet": { "count": 16, "value": 6 } }, { "call": false, "bet": { "count": 17, "value": 2 } }, { "call": false, "bet": { "count": 17, "value": 3 } }, { "call": false, "bet": { "count": 17, "value": 4 } }, { "call": false, "bet": { "count": 17, "value": 5 } }, { "call": false, "bet": { "count": 17, "value": 6 } }, { "call": false, "bet": { "count": 18, "value": 2 } }, { "call": false, "bet": { "count": 18, "value": 3 } }, { "call": false, "bet": { "count": 18, "value": 4 } }, { "call": false, "bet": { "count": 18, "value": 5 } }, { "call": false, "bet": { "count": 18, "value": 6 } }, { "call": false, "bet": { "count": 19, "value": 2 } }, { "call": false, "bet": { "count": 19, "value": 3 } }, { "call": false, "bet": { "count": 19, "value": 4 } }, { "call": false, "bet": { "count": 19, "value": 5 } }, { "call": false, "bet": { "count": 19, "value": 6 } }, { "call": false, "bet": { "count": 20, "value": 2 } }, { "call": false, "bet": { "count": 20, "value": 3 } }, { "call": false, "bet": { "count": 20, "value": 4 } }, { "call": false, "bet": { "count": 20, "value": 5 } }, { "call": false, "bet": { "count": 20, "value": 6 } }], "actionHistory": [{ "time": "2020-04-21T22:17:48.474174+02:00", "side": 3, "action": { "call": true, "bet": { "count": 1, "value": 2 } } }], "status": { "inPlay": true, "loser": -1, "winner": -1 }, "playerHand": [1, 1, 2, 6], "playerMessage": "Carolraised1d2", "roundReport": { "playerMadeBet": -1, "playerCalledBet": -1, "playerLost": -1, "playerDice": [], "playerContribution": [], "betCalled": { "count": 0, "value": 6 }, "betHighestStanding": { "count": 0, "value": 6 } }, "gameReport": { "playerLost": -1 }, "tournamentReport": { "playerWon": -1, "playerLost": -1 } }
-var gameID = "TestGameID"
+﻿var gameID = "TestGameID"
 $(document).ready(function () {
-    nextBoard(gameID);
+    renderLoop(true)
 });
 
-lastRefreshed = -1 //TODO: Get rid of this
-function nextBoard(gameID) {
-    $.getJSON("/game/taenkeboks/play/" + gameID +"/current",
+
+function renderLoop(initial=false) {
+    var endpoint = (initial?"/current":"/next")
+    $.getJSON("/game/taenkeboks/play/" + gameID + endpoint,
         function (v) {
-            currentMove = v.actionHistory.length
-            if (currentMove > lastRefreshed) {
-                lastRefreshed = currentMove
-                if (!v.status.inPlay) {
-                    render(v)
-                    //renderLifeResult(b.status, b, gameID, null)
-                }
-                else
-                    render(v)
+            var betContinue = function () {
+                renderBet(v)
+                var millisecondsToWait = 1000;
+                setTimeout(renderLoop, millisecondsToWait);//Display the last render for a second before continuing with loop
             }
+            var roundContinue = function (continuation) {
+                if (v.roundReport.playerMadeBet < 0)//empty round report
+                    return continuation;
+                else
+                    return function () { return renderRoundResult(v, continuation) }
+            }
+            var gameContinue = function (continuation) {
+                if (v.gameReport.playerLost < 0)//empty game report
+                    return continuation;
+                else
+                    return function () { return renderGameResult(v, continuation) }
+            }
+            var tournamentContinue = function (continuation) {
+                if (v.tournamentReport.playerWon >= 0)
+                    return function () { renderTournamentWon(v) }//render result and stop
+                else if (v.tournamentReport.playerLost >= 0)
+                    return function () { renderTournamentLost(v) }//render result and stop
+                else
+                    return continuation
+            }
+            roundContinue(gameContinue(tournamentContinue(betContinue)))()
         })
         .fail(
             function (jqXHR, textStatus, err) {
-                $("#dump").text(err)
+                console.log("Error getting events\ntextStatus: " + textStatus + "\njqXHR: " + jqXHR + "\err: " + err);
+                //$("#dump").text(err)
+                renderLoop(true)
             });
 }
 
-function render(v) {
-    $("#dump").empty().append(JSON.stringify(v, undefined, 2))
+
+function renderBet(v) {
     renderPlayers(v)
     $("#choppingBlock").html(v.totalDiceLeft + " dice in play")
     $("#currentBet").html(printBet(v.currentBet))
@@ -36,8 +54,127 @@ function render(v) {
         showMoves(v.legalActions, gameID)
     }
     else {
-        $("#nextPlayerText").text(playerNames[nextPlayer] + " to move")
+        $("#nextPlayerText").text(v.playerNames[v.nextSide] + " to move")
     }
+}
+
+function renderRoundResult(v, continuation) {
+    renderPlayers(v)
+    //render player hands and contributions
+    var report = v.roundReport
+    var hands = report.playerDice
+    var contributions = report.playerContribution
+    var betCalled = report.betCalled
+    var highestStanding = report.betHighestStanding
+    var betValue = betCalled.value
+    var contributionStrings = []
+    for (var side in hands) {
+        var handElement = $('#hand' + side)
+        populateHand(hands[side], handElement)
+        var betElement = $('#bet' + side)
+        var contribution = {
+            "count": contributions[side],
+            "value": betValue
+        }
+        if (contributions[side] > 0)
+        {
+            contributionStrings.push(printDiceCount(contribution))
+            populateBet(contribution, betElement)
+        }
+        else betElement.html("&nbsp;")
+    }
+    //render chopping block /player call
+    var choppingBlock = $('#choppingBlock');
+    var callingPlayer = v.playerNames[report.playerCalledBet]
+    choppingBlock.html(callingPlayer + ' called ' + printBet(betCalled))
+    //render call 
+    var bettingPlayer = v.playerNames[report.playerMadeBet]
+    var currentBetElement = $('#currentBet');
+    var contributionString = contributionStrings.join(" + ")
+    var comp = (report.playerMadeBet == report.playerLost) ? " < ":" >= "
+    currentBetElement.html(contributionString+comp+printBet(betCalled))
+
+    //render result and continue button
+    var losingPlayer = v.playerNames[report.playerLost]
+    $('#nextPlayerText').text(losingPlayer + ' lost')
+
+    hideMoves();
+    $("#continueButton").show()
+    $("#continueButton").off().click(function () {
+        continuation()
+    });
+}
+
+function renderGameResult(v, continuation) {
+    for (var side = 0; side < playerCount; side++) {
+        var handElement = $('#hand' + side)
+        populateHand([], handElement)
+        var betElement = $('#bet' + side)
+        betElement.html("&nbsp;")
+    }
+    //render player hands and contributions
+    var report = v.gameReport
+    var spec = v.spec
+    var playerCount = spec.playerCount
+
+    var choppingBlock = $('#choppingBlock')
+    var currentBetElement = $('#currentBet')
+    var nextPlayerElement = $('#nextPlayerText')
+    choppingBlock.text('round complete')
+    //render call 
+    var losingPlayer = v.playerNames[report.playerLost]
+    var losingPlayerLives = v.livesLeft[report.playerLost]
+    if (losingPlayerLives === 0)
+        currentBetElement.html(losingPlayer + ' is eliminated')
+    else
+        currentBetElement.html(losingPlayer + ' lost a life, ' + losingPlayerLives + ' remaining')
+
+    //render result
+    var nextPlayer = v.playerNames[v.nextSide]
+    nextPlayerElement.text()
+    //render continue button
+    hideMoves();
+    $("#continueButton").show()
+    $("#continueButton").off().click(function () {
+        continuation()
+    });
+}
+
+function renderTournamentWon(v) {
+    var report = v.tournamentReport
+    var choppingBlock = $('#choppingBlock')
+    var currentBetElement = $('#currentBet')
+    var nextPlayerElement = $('#nextPlayerText')
+
+    choppingBlock.text('game over')
+    var winningPlayer = v.playerNames[report.playerWon]
+    currentBetElement.html(winningPlayer + ' is the winner')
+    nextPlayerElement.text('')
+    hideMoves();
+    $("#restartButton").show();
+    $("#restartButton").off().click(function () { restartGame(board) });
+}
+
+function renderTournamentLost(v) {
+    var report = v.tournamentReport
+    var choppingBlock = $('#choppingBlock')
+    var currentBetElement = $('#currentBet')
+    var nextPlayerElement = $('#nextPlayerText')
+
+    choppingBlock.text('game over')
+    var losingPlayer = v.playerNames[report.playerLost]
+    currentBetElement.html(losingPlayer + ' lost')
+    //render result
+    nextPlayerElement.text('')
+    //render restart button
+    hideMoves();
+    $("#restartButton").show();
+    $("#restartButton").off().click(function () { restartGame(board) });
+}
+
+function populateBet(bet, betElement) {
+    var betString = printBet(bet)
+    betElement.html(betString)
 }
 
 function hideMoves() {
@@ -157,11 +294,61 @@ function renderPlayers(v) {
     $("#selfRow").empty().append(renderPlayerCell(v, v.viewingSide).attr('colspan', v.playerCount - 1));
 }
 
+function clearPlayers(v) {
+    $("#playerRow").empty()
+    for (i = 1; i < v.playerCount; i++) {
+        var side = (v.viewingSide + i) % v.playerCount
+        $("#playerRow").append(clearPlayerCell(v, side))
+    }
+    $("#selfRow").empty().append(clearPlayerCell(v, v.viewingSide).attr('colspan', v.playerCount - 1));
+}
+
 function renderPlayerCell(v, side) {
     var diceLeft = v.diceLeft[side]
     var playerName = v.playerNames[side]
     var livesLeft = v.livesLeft[side]
-    var lastBet = '&nbsp;'
+    var lastBet = "&nbsp;"
+    for (var i = 0; i < v.actionHistory.length; i++) {
+        if (v.actionHistory[i].action.call) break;
+        if (v.actionHistory[i].side === side) {
+            lastBet = printAction(v.actionHistory[i].action)
+            break;
+        }
+    }
+    var playerCell = $('<td id=\"' + side + '\" class="player">')
+    if (livesLeft === 0) {
+        playerCell = $('<td id=\"' + side + '\" class="player deadPlayer">')
+        playerCell.append('<div class="playerName">' + playerName + '</div>')
+    }
+    else if (livesLeft === 1)
+        playerCell.append('<div class="playerName">' + playerName + '</div>')
+    else
+        playerCell.append('<span class="playerName">' + playerName + '<span class="playerLives">&nbsp;x' + livesLeft + '</span></span>')
+
+    playerCell.append('<div id=\"bet' + side + '\" class="playerBet">' + lastBet + '<div>')
+    //var diceTable = $('<table class="dieTable"></table>')
+    var hand;
+    //diceRow.appendTo(diceTable)
+
+    var handElement = $('<div id=\"hand' + side + '\">')
+    if (side === v.viewingSide) {
+        hand = v.playerHand
+    }
+    else {
+        hand = Array.apply(null, Array(diceLeft)).map(Number.prototype.valueOf, 0);
+    }
+    populateHand(hand, handElement)
+    playerCell.append(handElement)
+    if (v.nextSide === side)
+        playerCell.addClass('active')
+    return playerCell
+}
+
+function clearPlayerCell(v, side) {
+    var diceLeft = v.diceLeft[side]
+    var playerName = v.playerNames[side]
+    var livesLeft = v.livesLeft[side]
+    var lastBet = "&nbsp;"
     for (var i = 0; i < v.actionHistory.length; i++) {
         if (v.actionHistory[i].action.call) break;
         if (v.actionHistory[i + 1].side === side) {
@@ -193,7 +380,7 @@ function renderPlayerCell(v, side) {
     }
     populateHand(hand, handElement)
     playerCell.append(handElement)
-    if (v.nextPlayer === side)
+    if (v.nextSide === side)
         playerCell.addClass('active')
     return playerCell
 }

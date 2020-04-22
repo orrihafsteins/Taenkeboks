@@ -1,4 +1,4 @@
-﻿var sCounts =
+﻿    var sCounts =
     [
         "INITIAL BET",
         "one",

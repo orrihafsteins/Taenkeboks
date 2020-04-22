@@ -62,7 +62,7 @@ function paramRow(name, select) {
 }
 
 
-function render(r) {
+function renderBet(r) {
     $("#dump").empty().append(JSON.stringify(r, undefined, 2))
     var pTable = $("#playerTable").empty()
     addSide(r.players)
@@ -186,7 +186,7 @@ function addSide(players) {
 
 function refreshGameRoom(roomID) {
     $.getJSON("/api/gameroom/" + roomID,
-            render
+            renderBet
         )
         .fail(
             function (jqXHR, textStatus, err) {

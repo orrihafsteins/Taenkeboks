@@ -54,7 +54,7 @@ module TbRules =
                     time=DateTime.Now
                     side = state.nextSide
                     action = {
-                            call=true
+                            call=false
                             bet=b
                         }
                 }::state.actionHistory
@@ -101,6 +101,11 @@ module TbRules =
                         madeBetSide = -1
                         playersLeft = playersLeft
                         nextSide = loser
+                        actionHistory = {
+                                time=DateTime.Now
+                                side = state.nextSide
+                                action = TbAction.call
+                            }::state.actionHistory
                         playerStates = playerStates |> Array.map (fun ps -> if ps.livesLeft > 0 then ps |> TbPlayerState.throw else ps)
                         status = TbStatus.inPlay
                         roundReport = roundReport
@@ -116,15 +121,20 @@ module TbRules =
                     //tournament not over, start a new game
                     let playerStates = playerStates |> Array.map (TbPlayerState.initGame spec)
                     { state with
-                            totalDiceLeft = livingPlayers.Length * spec.diceCount
-                            currentBet = TbBet.startingBet
-                            madeBetSide = -1
-                            playersLeft = livingPlayers.Length
-                            nextSide = if playerLives.[loser] > 0 then loser else livingPlayers.[r.Next() % livingPlayers.Length]
-                            playerStates = playerStates
-                            status = TbStatus.inPlay
-                            roundReport = roundReport
-                            gameReport = TbGameReport.empty
+                        totalDiceLeft = livingPlayers.Length * spec.diceCount
+                        currentBet = TbBet.startingBet
+                        madeBetSide = -1
+                        playersLeft = livingPlayers.Length
+                        nextSide = if playerLives.[loser] > 0 then loser else livingPlayers.[r.Next() % livingPlayers.Length]
+                        actionHistory = {
+                                time=DateTime.Now
+                                side = state.nextSide
+                                action = TbAction.call
+                            }::state.actionHistory
+                        playerStates = playerStates
+                        status = TbStatus.inPlay
+                        roundReport = roundReport
+                        gameReport = TbGameReport.gameLost loser
                     }
                 elif (spec.lastStanding && livingPlayers.Length = 1) then
                     //tournament playing for a winner and one player left
@@ -134,6 +144,11 @@ module TbRules =
                         madeBetSide = Side.None
                         playersLeft = livingPlayers.Length
                         nextSide = Side.None
+                        actionHistory = {
+                                time=DateTime.Now
+                                side = state.nextSide
+                                action = TbAction.call
+                            }::state.actionHistory
                         playerStates = playerStates
                         status = TbStatus.tournamentWon livingPlayers.[0]
                         roundReport = roundReport
@@ -148,6 +163,11 @@ module TbRules =
                         madeBetSide = Side.None
                         playersLeft = livingPlayers.Length
                         nextSide = Side.None
+                        actionHistory = {
+                                time=DateTime.Now
+                                side = state.nextSide
+                                action = TbAction.call
+                            }::state.actionHistory
                         playerStates = playerStates
                         status = TbStatus.tournamentLost loser
                         roundReport = roundReport
