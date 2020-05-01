@@ -9,6 +9,7 @@ function renderLoop(initial=false) {
     var endpoint = (initial?"current/":"next/")
     $.getJSON("/api/" + endpoint + gameID,
         function (v) {
+            $("#dump").text(JSON.stringify(v))
             var betContinue = function () {
                 renderBet(v)
                 var millisecondsToWait = 1000;
