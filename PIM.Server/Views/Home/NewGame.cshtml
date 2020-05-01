@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "New game";
+}
+<h1>@ViewData["Title"]</h1>
+
+<form id="newGameForm"></form>
+
+
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#newGameForm').jsonForm(newGameForm);//defined in newgame.js
+        });
+    </script>
+}
+    

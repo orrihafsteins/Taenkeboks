@@ -1,5 +1,5 @@
 ﻿
-<span hidden id="gameID">TestGameID</span>
+<span hidden id="gameID">@ViewData["GameId"]</span>
 
 <table id="game">
     <tr id="playerRow"></tr>
@@ -10,6 +10,7 @@
             <div class="t2" id="nextPlayer">
                 <span id="nextPlayerText"></span>
                 <button class="gameAction" id="restartButton">restart game</button>
+                <button class="gameAction" id="newGameButton">new game</button>
                 <span id="callSpan">
                     <button class="gameAction" id="callButton">call</button>
                     - or -
@@ -25,11 +26,6 @@
         </td>
     </tr>
     <tr id="selfRow"></tr>
-
 </table>
 
-
-@**@
-@*<button id="btn1">Make Bet</button>*@
-@*<div id=" "></div>*@
-<pre id="dump">dump</pre>
+@*<pre id="dump">dump</pre>*@

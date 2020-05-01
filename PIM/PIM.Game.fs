@@ -4,21 +4,21 @@ open System.Threading
 
 //'S: Board state type (full game information)
 //'A: Action type
-//'V: Visible information
-//'R: Action report
-//'Status: Game status, (in play, game over, x won, y lost, etc.)
-
+//'V: Visible information type
 
 type Side = int
+
 module Side = 
     let None = -1
     let X = 0
     let O = 1
     let other (s:int) = 1-s
+
 type GameStatus =
     | InPlay
     | Winner of Side
     | Loser of Side 
+
 type Player<'V,'A> =
     {
         playerName:String
@@ -59,6 +59,7 @@ type Game<'S,'A,'V> =
         gameOver: 'S -> bool
         nextSide: 'S -> Side
     }
+
  module Game =
      let play (game:Game<'S,'A,'V>) (players:Player<'V,'A>[]) =
          let updatePlayers state =

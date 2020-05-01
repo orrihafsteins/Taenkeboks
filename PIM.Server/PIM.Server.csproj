@@ -8,19 +8,21 @@
   <ItemGroup>
     <Compile Remove="Controllers\GameRoomController.cs" />
     <Compile Remove="Controllers\TaenkeboksApiController.cs" />
-    <Compile Remove="DataModel\DataModel.cs" />
-    <Compile Remove="DataModel\GameManager.cs" />
-    <Compile Remove="DataModel\GameRoomManager.cs" />
-    <Compile Remove="DataModel\PlayerManager.cs" />
-    <Compile Remove="DataModel\TaenkeboksManager.cs" />
+    <Compile Remove="Game\DataModel.cs" />
+    <Compile Remove="Game\GameManager.cs" />
+    <Compile Remove="Game\GameRoomManager.cs" />
+    <Compile Remove="Game\PlayerManager.cs" />
+    <Compile Remove="Game\TaenkeboksManager.cs" />
     <Compile Remove="Models\BoardView.cs" />
     <Compile Remove="Models\GameEventView.cs" />
     <Compile Remove="Models\GameRoomEventView.cs" />
     <Compile Remove="Models\GameRoomView.cs" />
     <Compile Remove="Models\PlayerView.cs" />
-    <Compile Remove="Models\Taenkeboks\ActionResponseView.cs" />
-    <Compile Remove="Models\Taenkeboks\ActionView.cs" />
-    <Compile Remove="Models\Taenkeboks\TaenkeBoksParameterView.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="libman.json" />
+    <Content Remove="Views\Game\_Layout.OLD.cshtml" />
   </ItemGroup>
 
 
@@ -36,7 +38,17 @@
 
 
   <ItemGroup>
-    <Folder Include="Models\Taenkeboks\" />
+    <None Include="wwwroot\lib\jsonform\ace\ace.js" />
+    <None Include="wwwroot\lib\jsonform\ace\mode-css.js" />
+    <None Include="wwwroot\lib\jsonform\ace\mode-html.js" />
+    <None Include="wwwroot\lib\jsonform\ace\mode-javascript.js" />
+    <None Include="wwwroot\lib\jsonform\ace\mode-json.js" />
+    <None Include="wwwroot\lib\jsonform\ace\mode-less.js" />
+    <None Include="wwwroot\lib\jsonform\ace\mode-markdown.js" />
+    <None Include="wwwroot\lib\jsonform\ace\theme-twilight.js" />
+    <None Include="wwwroot\lib\jsonform\ace\worker-css.js" />
+    <None Include="wwwroot\lib\jsonform\ace\worker-javascript.js" />
+    <None Include="wwwroot\lib\jsonform\ace\worker-json.js" />
   </ItemGroup>
 
 

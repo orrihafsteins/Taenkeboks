@@ -1,12 +1,13 @@
-﻿var gameID = "TestGameID"
+﻿var gameID;
 $(document).ready(function () {
+    gameID = $('#gameID').text()
     renderLoop(true)
 });
 
 
 function renderLoop(initial=false) {
-    var endpoint = (initial?"/current":"/next")
-    $.getJSON("/game/taenkeboks/play/" + gameID + endpoint,
+    var endpoint = (initial?"current/":"next/")
+    $.getJSON("/api/" + endpoint + gameID,
         function (v) {
             var betContinue = function () {
                 renderBet(v)
@@ -152,7 +153,9 @@ function renderTournamentWon(v) {
     nextPlayerElement.text('')
     hideMoves();
     $("#restartButton").show();
-    $("#restartButton").off().click(function () { restartGame(board) });
+    $("#restartButton").off().click(restartGame);
+    $("#newGameButton").show();
+    $("#newGameButton").off().click(newGame);
 }
 
 function renderTournamentLost(v) {
@@ -169,7 +172,30 @@ function renderTournamentLost(v) {
     //render restart button
     hideMoves();
     $("#restartButton").show();
-    $("#restartButton").off().click(function () { restartGame(board) });
+    $("#restartButton").off().click(restartGame);
+    $("#newGameButton").show();
+    $("#newGameButton").off().click(newGame);
+}
+
+function restartGame() {
+    var data = { GameId: gameID }
+    $.ajax({
+        type: 'POST',
+        accepts: 'application/json',
+        url: "/api/duplicate",
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("error duplicating game: " + errorThrown);
+        },
+        success: function (newGameID) {
+            window.location.href = "/game/play/" + newGameID;
+        }
+    });
+}
+
+function newGame() {
+    window.location.href = "/home/newgame/"
 }
 
 function populateBet(bet, betElement) {
@@ -182,6 +208,7 @@ function hideMoves() {
     $("#raiseSpan").hide()
     $("#continueButton").hide()
     $("#restartButton").hide()
+    $("#newGameButton").hide()
 }
 
 function showMoves(legalMoves) {
@@ -194,7 +221,7 @@ function showMoves(legalMoves) {
             $.ajax({
                 type: 'POST',
                 accepts: 'application/json',
-                url: "/game/taenkeboks/play/" + gameID +"/action",
+                url: "/api/action/" + gameID,
                 contentType: 'application/json',
                 data: JSON.stringify(legalMoves[0]),
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -254,7 +281,7 @@ function showMoves(legalMoves) {
         $.ajax({
             type: 'POST',
             accepts: 'application/json',
-            url: "/game/taenkeboks/play/" + gameID + "/action",
+            url: "/api/action/" + gameID,
             contentType: 'application/json',
             data: JSON.stringify(bet),
             error: function (jqXHR, textStatus, errorThrown) {
@@ -268,7 +295,7 @@ function showMoves(legalMoves) {
 }
 
 function printBet(b) {
-    if (b.count === 0) return "round start"
+    if (b.count === 0) return "Initial Bet"
     return printDiceCount(b)
 }
 

@@ -1,8 +1,38 @@
 ﻿@{
-    ViewData["Title"] = "Game";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>@ViewData["Title"]</h1>
+
+
+<input type="button" class="btn btn-primary " id="createGameButton" value="Create Game">
+<input type="button" class="btn btn-primary " id="startGameButton" value="Start Game">
+
+
+
+@section scripts {
+    <script type="text/javascript">
+        function startGame() {
+            $.ajax({
+                type: 'POST',
+                accepts: 'application/json',
+                url: "/api/default",
+                contentType: 'application/json',
+                data: "{}",
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("error creating game: " + errorThrown);
+                },
+                success: function (newGameID) {
+                    window.location.href = "/game/play/" + newGameID;
+                }
+            });
+        }
+        function createGame() {
+            window.location.href = "/home/newgame/";
+        }
+        $(document).ready(function () {
+            $('#createGameButton').click(createGame);
+            $('#startGameButton').click(startGame);
+        });
+    </script>
+}
