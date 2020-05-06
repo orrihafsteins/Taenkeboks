@@ -1,173 +1,20 @@
 ﻿@{
     ViewData["Title"] = "Tænkeboks";
 }
-<div class="container m-3">
-    <div class="row">
-        <div class="col">
-            <div class="bs-component">
-                <div class="card text-white bg-secondary mb-3">
-                    <div class="card-header">Alice</div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Lives:
-                                <span class="badge badge-success badge-pill">x1</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Last Bet:
-                                <span>4 <img class="die" src="/images/Dice5.gif"></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Dice:
-                                <span>
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bs-component">
-                <div class="card text-white bg-primary mb-3">
-                    <div class="card-header">Bob</div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Lives:
-                                <span class="badge badge-success badge-pill">x1</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Last Bet:
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Dice:
-                                <span>
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bs-component">
-                <div class="card text-white bg-dark mb-3" style="height:100%">
-                    <div class="card-header">Carol</div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Lives:
-                                <span class="badge badge-primary badge-danger">x0</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Last Bet:
-                                <span>3 <img class="die" src="/images/Dice5.gif"></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Dice:
-                                <span>
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                    <img class="die" src="/images/DiceAny.gif">
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <div class="bs-component">
-                <div class="card text-white bg-info mb-3">
-                    <div class="card-header">Current Bet</div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Total Dice:
-                                <span>16</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Made Bet:
-                                <span>Alice</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Bet:
-                                <span>4 <img class="die" src="/images/Dice5.gif"></span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <div class="bs-component">
-                <div class="card text-white bg-secondary mb-3">
-                    <div class="card-header">orrihafsteins@gmail.com</div>
-                    <div class="card-body  align-items-center">
-                        <div>
-                            <form class="form-inline m-1">
-                                <button class="btn btn-primary" id="callButton">call</button>
-                                &nbsp;/&nbsp;
-                                <button class="btn btn-primary" id="raiseButton">raise</button>
-                                &nbsp;
-                                <select class="form-control" id="raiseCounts"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option></select>
-                                &nbsp;of&nbsp;
-                                <select class="form-control" id="raiseValues"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
-                            </form>
-                        </div>
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Lives:
-                                <span class="badge badge-success badge-pill">x1</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Last Bet:
-                                <span>3 <img class="die" src="/images/Dice6.gif"></span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Dice:
-                                <span>
-                                    <img class="die" src="/images/Dice1.gif">
-                                    <img class="die" src="/images/Dice2.gif">
-                                    <img class="die" src="/images/Dice3.gif">
-                                    <img class="die" src="/images/Dice4.gif">
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="display">
-
-</div>
+<div hidden id="gameID">@ViewData["GameId"]</div>
+<div id="display"></div>
 
 @section scripts {
     <script src="~/js/dice.js"></script>
     <script src="~/js/cards.js"></script>
-    <script src="~/js/taenkeboksCards.js"></script>
-    <script src="~/js/tmp.js"></script>
+    <script src="~/js/taenkeboksElements.js"></script>
+    <script src="~/js/taenkeboksGame.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#display').html(display)
+            var gameId = $('#gameID').text()
+            var eDisplay = $('#display')
+            var game = new TbGame(gameId, eDisplay);
+            game.render();
         });
     </script>
 }

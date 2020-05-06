@@ -30,8 +30,11 @@ namespace PIM.Server.Controllers
             return View();
         }
 
-        public IActionResult Taenkeboks()
+
+        [HttpGet("taenkeboks/{gameId}")]
+        public IActionResult Taenkeboks(string gameId)
         {
+            ViewData["GameId"] = gameId;
             return View();
         }
 

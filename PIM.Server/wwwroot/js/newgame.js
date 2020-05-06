@@ -121,7 +121,7 @@ var newGameForm = {
                     alert("error creating game: " + errorThrown);
                 },
                 success: function (newGameID) {
-                    window.location.href = "/game/play/" + newGameID;
+                    window.location.href = "/"+values.game+"/" + newGameID;
                 }
             });
         }
