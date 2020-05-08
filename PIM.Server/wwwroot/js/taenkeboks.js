@@ -196,7 +196,7 @@ function restartGame() {
 }
 
 function newGame() {
-    window.location.href = "/home/newgame/"
+    window.location.href = "/newgame/"
 }
 
 function populateBet(bet, betElement) {

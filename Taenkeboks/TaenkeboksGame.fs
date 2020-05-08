@@ -33,7 +33,6 @@ type TbGame = Game<TbState,TbAction,TbVisible>
 module TbGame =
     open TbRules
     let create (spec:TbGameSpec):TbGame= 
-        if not spec.lastStanding && spec.extraLives > 0 then failwith "Extra lives only when last standing"
         {
             init = (fun playerNames -> TbTaenkeboksState.create spec playerNames)   //(fun ps -> TaenkeboksState.init spec ps.Length)
             advance = advance

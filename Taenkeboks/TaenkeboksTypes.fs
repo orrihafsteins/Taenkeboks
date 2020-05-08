@@ -165,7 +165,7 @@ module TbGameSpec =
     let isSeries(spec:TbGameSpec) (hand:TbHand) = 
         if spec.oneIsSeries && hand = [|1|] then 
             true
-        elif spec.multiSeries && hand.Length > 1 && hand = ([| hand.[0]..(hand.[0] + hand.Length) |]) then
+        elif spec.multiSeries && hand.Length > 1 && hand = ([| hand.[0]..(hand.[0] + hand.Length - 1) |]) then
             true
         else (spec.multiSeries |> not) && hand.Length > 1 && hand = ([| 1..hand.Length |])
 

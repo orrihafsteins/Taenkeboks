@@ -98,14 +98,14 @@ module AI =
             let predictedHands = Array.zeroCreate info.playerCount 
             let moveHistory = info.actionHistory |> Seq.map (fun a->a.action)
             let hotseatHistory = info.actionHistory |> Seq.map (fun a->a.side)
-            let thisRoundsBets = 
-                Seq.zip moveHistory (hotseatHistory |> Seq.skip 1)
-                |> Seq.takeMaybe (info.playersLeft - 1)
-                |> Seq.takeWhile (fun (b,p) -> not b.call)
-                |> Seq.iter (fun (b,p) -> 
-                    let count,value = b.bet.count,b.bet.value
-                    predictedHands.[p] <- value
-                )
+            //let thisRoundsBets = 
+            //    Seq.zip moveHistory (hotseatHistory |> Seq.skip 1)
+            //    |> Seq.takeMaybe (info.playersLeft - 1)
+            //    |> Seq.takeWhile (fun (b,p) -> not b.call)
+            //    |> Seq.iter (fun (b,p) -> 
+            //        let count,value = b.bet.count,b.bet.value
+            //        predictedHands.[p] <- value
+            //    )
             let p = Simulator.sampleCurrentBet info simLast
             let target = 1.0 / (float info.playersLeft)
             if p < target then

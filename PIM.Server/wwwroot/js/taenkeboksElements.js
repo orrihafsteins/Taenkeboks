@@ -20,7 +20,10 @@ class TbPlayerCard {
         this.stateClasses = {
             eliminated: "dark",
             toPlay: "primary",
-            waiting: "secondary"
+            waiting: "secondary",
+            safe: "dark",
+            winner: "success",  
+            loser: "danger"
         }
         this.state = "waiting"
     }
@@ -46,9 +49,8 @@ class TbMainCard {
     static Round(v) {
         var card = new Card("Call Report");
         var report = v.roundReport
-        var betValue = report.betCalled.value
+        var betValue = report.betHighestStanding.value //highest standing has the best value in case of "any" valued bet
         var betCalled = new TbBet(report.betCalled)
-        var highestStanding = new TbBet(report.betHighestStanding)
         var contributions = report.playerContribution.filter(c => c > 0).map(c => new TbBet({ count: c, value: betValue })).map(b => b.render())
         var callingPlayer = v.playerNames[report.playerCalledBet]
         var bettingPlayer = v.playerNames[report.playerMadeBet]
@@ -88,6 +90,8 @@ class TbMainCard {
             card.items['Loser'] = v.playerNames[report.playerLost]
         if (report.playerWon >= 0)
             card.items['Winner'] = v.playerNames[report.playerWon]
+        card.items['Restart'] = '<button class="btn btn-success" id="restartButton">Restart</button>'
+        card.items['New Game'] = '<button class="btn btn-success" id="newGameButton">New Game</button>'
         return card
     }
 }
@@ -147,11 +151,11 @@ class TbAction {
                                     return countValues
                                 }
                                 var count = options[selectedIndex].value
-                                TbUtil.updateDropdown('${valuesId}', fValues(count), c => c, null)                                
+                                TbUtil.updateDropdown('${valuesId}', fValues(count), v => (v==0)?'Any':v, null)                                
 
                             })(this.selectedIndex,this.options)`
         var sCountDropdown = TbUtil.renderDropdown(countsId, counts, c => c, nextRaise.bet.count, onCountChange)
-        var sValueDropdown = TbUtil.renderDropdown(valuesId, fValues(nextRaise.bet.count), c => c, nextRaise.bet.value)
+        var sValueDropdown = TbUtil.renderDropdown(valuesId, fValues(nextRaise.bet.count), v => (v == 0) ?'Any':v, nextRaise.bet.value)
         var sCall = ""
         if (v.madeBetSide >= 0)
             sCall = `

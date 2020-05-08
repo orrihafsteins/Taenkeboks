@@ -20,7 +20,9 @@ var newGameForm = {
                     "Bob",
                     "Alice",
                     "Carol",
-                    "orrihafsteins@gmail.com"
+                    "Dan",
+                    "orrihafsteins@gmail.com",
+                    "a@a.a"
                 ]
             }
         },

@@ -9,7 +9,6 @@
     <Compile Remove="Controllers\GameRoomController.cs" />
     <Compile Remove="Controllers\TaenkeboksApiController.cs" />
     <Compile Remove="Game\DataModel.cs" />
-    <Compile Remove="Game\GameManager.cs" />
     <Compile Remove="Game\GameRoomManager.cs" />
     <Compile Remove="Game\PlayerManager.cs" />
     <Compile Remove="Game\TaenkeboksManager.cs" />

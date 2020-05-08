@@ -8,10 +8,13 @@
 
 
 @section scripts {
+    <script src="~/lib/underscore.js/underscore-min.js"></script>
+    <script src="~/lib/jsonform/jsonform.min.js"></script>
+    <script src="~/lib/jsonform/jsv.js"></script>
+    <script src="~/js/newgame.js" asp-append-version="true"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $('#newGameForm').jsonForm(newGameForm);//defined in newgame.js
         });
     </script>
 }
-    

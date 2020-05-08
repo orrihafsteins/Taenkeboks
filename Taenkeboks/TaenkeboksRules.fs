@@ -16,11 +16,11 @@ module TbRules =
             if spec.ofAnyKind |> not then failwith "death"
             let c, v = countAnything spec hands
             let contributions = hands |>  Array.map(countValues spec v)
-            c,contributions
+            c,v,contributions
         else
             let contributions = hands |>  Array.map(countValues spec value)
             let count = contributions |> Seq.sum
-            count,contributions
+            count,value,contributions
     let countTotalValues spec value (hands:TbHand[])  =
         if value = 0 then 
             if spec.ofAnyKind |> not then failwith "death"
@@ -35,10 +35,10 @@ module TbRules =
     let highestStanding (state:TbState) (bet:TbBet) =
         //Returns the bet with the highest count that has the same value as bet and the contributions to the count from each player
         let count, value = bet.count,bet.value
-        let totalCount,contributions = countTotalValuesContributions state.spec value (state.playerStates |> Array.map (fun p -> p.hand))
+        let totalCount,bestValue,contributions = countTotalValuesContributions state.spec value (state.playerStates |> Array.map (fun p -> p.hand))
         {
             count=totalCount
-            value=value
+            value=bestValue
         },contributions
     let advanceBet(b:TbBet) (state:TbState): TbState = 
         let nextPlayer =

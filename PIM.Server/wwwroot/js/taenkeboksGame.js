@@ -53,21 +53,23 @@ class TbGame {
         var pn = v.playerNames[side]
         var p = new TbPlayerCard(pn)
         if (dice != null) {
-            p.dice = dice
+            p.dice = new Hand(dice)
         }
-        if (side == v.nextSide && side == v.viewingSide) {
+        else if (side == v.nextSide && side == v.viewingSide) {
             p.dice = new Hand(v.playerHand)
         }
         else {
             p.dice = new Hand(Array(v.diceLeft[side]).fill(0))
         }
         p.lives = v.livesLeft[side]
-        if (p.lives == 0)
+        if (v.tournamentReport.playerWon == side)
+            p.state = "winner"
+        else if (v.tournamentReport.playerLost == side)
+            p.state = "loser"
+        else if (p.lives == 0)
             p.state = "eliminated"
         else if (v.nextSide == side)
-            p.state = "toPlay"
-        else if (v.diceLeft[side] == 0)
-            p.state = "safe"
+            p.state = "toPlay"    
         else
             p.state = "waiting"
         //Find last bet or show bet form
@@ -137,7 +139,7 @@ class TbGame {
 
     displayRoundResult(v, cnt) {
         var report = v.roundReport
-        var betValue = report.betCalled.value
+        var betValue = report.betHighestStanding.value
         var contributions = report.playerContribution.map(c => new TbBet({ count: c, value: betValue }))
         var players = v.playerNames.map(function (pn, index) {
             var dice = report.playerDice[index]
@@ -166,6 +168,8 @@ class TbGame {
         })
         var mainCard = TbMainCard.Tournament(v)
         this.display(TbGame.renderBoard(v, players, mainCard))
+        $('#restartButton').off().click(this.restartGame.bind(this))
+        $('#newGameButton').off().click(this.newGame.bind(this))
     }
 
     postAction(action) {
@@ -201,6 +205,27 @@ class TbGame {
             "bet": bet
         }
         this.postAction(action)
+    }
+
+    restartGame() {
+        var data = { GameId: this.gameId }
+        $.ajax({
+            type: 'POST',
+            accepts: 'application/json',
+            url: "/api/duplicate",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("error duplicating game: " + errorThrown);
+            },
+            success: function (newGameID) {
+                window.location.href = "/taenkeboks/" + newGameID;
+            }
+        });
+    }
+
+    newGame() {
+        window.location.href = "/newgame/"
     }
 }
 

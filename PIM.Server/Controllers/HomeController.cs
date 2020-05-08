@@ -25,6 +25,8 @@ namespace PIM.Server.Controllers
             return View();
         }
 
+
+        [HttpGet("newgame")]
         public IActionResult NewGame()
         {
             return View();
