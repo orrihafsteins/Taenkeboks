@@ -14,7 +14,15 @@
     <script src="~/js/newgame.js" asp-append-version="true"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#newGameForm').jsonForm(newGameForm);//defined in newgame.js
+            render($('#newGameForm'))
+            $('#newGameForm').submit(()=>false)
+            addPlayer()
+        });
+
+        $(window).on('beforeunload', function ()
+        {
+            removePlayer()
+            return false;
         });
     </script>
 }

@@ -6,16 +6,11 @@ using Taenkeboks;
 
 namespace PIM.Server.Game
 {
-    public enum GameType { Taenkeboks };
-    public class GameSpec
-    {
-        public string[] Players { get; set; }
-        public GameType Game { get; set; }
-        public TbGameSpec Taenkeboks { get; set; }
-    }
     public class GameManager
     {
         public static GameManager Instance { get; } = new GameManager();
+
+        public static string[] CpuPlayers = new string[] { "Bob", "Alice", "Carol", "Dan" };
 
         private Dictionary<string, GameTask> _games = new Dictionary<string, GameTask>();
         public GameTask GetGame(string id) => _games[id]; //TODO: Throw custom exception
@@ -35,7 +30,6 @@ namespace PIM.Server.Game
             return game;
         }
 
-        string[] CpuPlayers = new string[] { "Bob", "Alice", "Carol", "Dan" };
         public GameTask CreateGame(GameSpec spec)
         {
             PlayerSpec[] playerSpecs = spec.Players.Select(pn => new PlayerSpec()
