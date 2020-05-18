@@ -105,12 +105,14 @@ namespace PIM.Server.Controllers
             return Ok();
         }
 
+        public class ReadyResponse { public string GameId { get; set; } }
         [HttpGet("lobby/readyPlayer/{lastVersion}")]
         public async Task<ActionResult<string>> LobbyReadyPlayer(int readyVersion)
         {
             string playerName = _signInManager.UserManager.GetUserName(this.User);
             var gameId = await Lobby.Instance.Ready(playerName, readyVersion);
-            return Ok(gameId);
+            var r = Taenkeboks.Json.serializeIndented(new ReadyResponse() { GameId = gameId });
+            return Ok(r);
         }
 
         [HttpGet("lobby/next/{lastVersion}")]

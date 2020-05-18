@@ -48,14 +48,13 @@ class TbGame {
         renderLoop(true)
     }
 
-
     static playerCard(v, side, dice = null, bet = null) {
         var pn = v.playerNames[side]
         var p = new TbPlayerCard(pn)
         if (dice != null) {
             p.dice = new Hand(dice)
         }
-        else if (side == v.nextSide && side == v.viewingSide) {
+        else if (side == v.viewingSide) {
             p.dice = new Hand(v.playerHand)
         }
         else {

@@ -325,11 +325,10 @@ module TbAction =
 module TbTaenkeboksState =
     let r = System.Random()
     let create(spec:TbGameSpec) (playerNames:string[])= 
-        if spec.playerCount < 2 then failwith "Player count < 2"
         let startingPlayer = r.Next() % spec.playerCount
         {
             playerNames=playerNames
-            spec=spec
+            spec = spec
             totalDiceLeft = spec.playerCount * spec.diceCount
             currentBet = TbBet.startingBet
             madeBetSide = -1

@@ -10,7 +10,12 @@ namespace PIM.Server.Game
     {
         public static GameManager Instance { get; } = new GameManager();
 
-        public static string[] CpuPlayers = new string[] { "Bob", "Alice", "Carol", "Dan" };
+        public static string[] CpuPlayers = new string[] {
+            "Alice", 
+            "Bob", 
+            "Carol", 
+            "Dan",
+        };
 
         private Dictionary<string, GameTask> _games = new Dictionary<string, GameTask>();
         public GameTask GetGame(string id) => _games[id]; //TODO: Throw custom exception

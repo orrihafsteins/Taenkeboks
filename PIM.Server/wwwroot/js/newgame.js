@@ -3,16 +3,21 @@ function update(evt) {
     $('#newGameForm').submit()
 }
 
+var currentVersion = -1
+var currentGameType = ""
 function render(display) {
     function renderLoop(lastVersion) {
         $.getJSON(
             "/api/lobby/next/" + lastVersion,
             lobbyState => {
+                //need these for the ready function
+                currentVersion = lobbyState.Version
+                currentGame = lobbyState.Spec.GameType
                 display.empty()
                 display.jsonForm(newGameForm(lobbyState))
-                $("input").change(update)
-                $("select").change(update)
-                $("button").removeClass("btn-default").addClass("btn-primary")
+                $('#newGameForm').find("input").change(update)
+                $('#newGameForm').find("select").change(update)
+                $('#newGameForm').find("button").removeClass("btn-default").addClass("btn-primary")
                 renderLoop(lobbyState.Version)
             }
         ).fail(
@@ -54,6 +59,23 @@ function removePlayer() {
             //refreshBoard();
         }
     });
+}
+
+
+function ready(evt) {
+    $.getJSON(
+        "/api/lobby/readyPlayer/" + currentVersion,
+        readyResponse => {
+            id = readyResponse.GameId
+            if (id === "")
+                alert("Game changed")
+            else
+                window.location.href = "/Taenkeboks/" + id; //Game should not be hardcoded
+        }
+    ).fail(
+        function (jqXHR, textStatus, err) {
+            console.log("Error getting ready\ntextStatus: " + textStatus + "\njqXHR: " + jqXHR + "\err: " + err);
+        });
 }
 
 function newGameForm(lobbyState) {
@@ -137,10 +159,7 @@ function newGameForm(lobbyState) {
                     {
                         "type": "button",
                         "title": "Ready",
-                        "onClick": function (evt) {
-                            evt.preventDefault();
-                            alert('Thank you!');
-                        },
+                        "onClick": ready,
                         "fieldHtmlClass": "yeah",
                         "htmlClass": "yeah2"
                     }
@@ -173,6 +192,8 @@ function newGameForm(lobbyState) {
                 alert("error creating game: " + errors);
             }
             else {
+                if (values.Game === "Taenkeboks")
+                    values.Taenkeboks.playerCount = values.Players.length//find a better place to do this
                 $.ajax({
                     type: 'POST',
                     accepts: 'application/json',

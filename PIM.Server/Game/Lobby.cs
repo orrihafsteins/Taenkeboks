@@ -37,7 +37,7 @@ namespace PIM.Server.Game
             Version++;
             _readyPlayers.Clear();
             _next.SetResult(this);
-            _ready.SetResult("");
+            _ready.TrySetResult("");
             _next = new TaskCompletionSource<LobbyState>();
             _ready = new TaskCompletionSource<string>();
         }
@@ -59,7 +59,7 @@ namespace PIM.Server.Game
         public async Task<string> ReadyPlayer(string player,int readyVersion)
         {
             _readyPlayers.Add(player);
-            if (Spec.Players.All(p => _readyPlayers.Contains(p)))
+            if (Spec.Players.Where(p=> !GameManager.CpuPlayers.Contains(p)).All(p => _readyPlayers.Contains(p)))
                 StartGame();
             return await _ready.Task;
         }
@@ -86,6 +86,7 @@ namespace PIM.Server.Game
             Spec.Players = Spec.Players.OrderBy(x => _r.Next()).ToArray();
             var gameId = GameManager.Instance.CreateGame(Spec).Id;
             _readyPlayers.Clear();
+            _ready.SetResult(gameId);
             return gameId;
         }
     }
